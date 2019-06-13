@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Emico\RobinHqLib\Config\ConfigInterface" type="Emico\RobinHq\Model\Config" />
+
+    <!-- Mappers -->
+    <virtualType name="Emico\RobinHq\Mapper\DetailOrderFactory" type="Emico\RobinHq\Mapper\OrderFactory">
+        <arguments>
+            <argument name="detailViewProvider" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\DefaultDetailViewProvider</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Emico\RobinHq\Mapper\SimpleOrderFactory" type="Emico\RobinHq\Mapper\OrderFactory">
+        <arguments>
+            <argument name="detailViewProvider" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\NullProvider</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Emico\RobinHq\Mapper\SimpleCustomerFactory" type="Emico\RobinHq\Mapper\CustomerFactory">
+        <arguments>
+            <argument name="panelViewProvider" xsi:type="object">Emico\RobinHq\DataProvider\PanelView\Customer\NullProvider</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Emico\RobinHq\Mapper\CustomerOrdersOrderFactory" type="Emico\RobinHq\Mapper\OrderFactory">
+        <arguments>
+            <argument name="detailViewProvider" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\NullProvider</argument>
+            <argument name="listViewProvider" xsi:type="object">Emico\RobinHq\DataProvider\ListView\Order\CustomerOrdersListViewProvider</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Data providers -->
+    <type name="Emico\RobinHq\DataProvider\OrderDataProvider">
+        <arguments>
+            <argument name="orderFactory" xsi:type="object">Emico\RobinHq\Mapper\DetailOrderFactory</argument>
+        </arguments>
+    </type>
+
+    <type name="Emico\RobinHq\DataProvider\CustomerOrdersDataProvider">
+        <arguments>
+            <argument name="orderFactory" xsi:type="object">Emico\RobinHq\Mapper\CustomerOrdersOrderFactory</argument>
+        </arguments>
+    </type>
+
+    <type name="Emico\RobinHq\DataProvider\SearchDataProvider">
+        <arguments>
+            <argument name="customerFactory" xsi:type="object">Emico\RobinHq\Mapper\SimpleCustomerFactory</argument>
+            <argument name="orderFactory" xsi:type="object">Emico\RobinHq\Mapper\SimpleOrderFactory</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Emico\RobinHq\DataProvider\CustomerLifetimeDataProvider" type="Emico\RobinHq\DataProvider\CustomerDataProvider">
+        <arguments>
+            <argument name="customerFactory" xsi:type="object">Emico\RobinHq\Mapper\SimpleCustomerFactory</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Detail view providers -->
+    <preference for="Emico\RobinHq\DataProvider\DetailView\DetailViewProviderInterface" type="Emico\RobinHq\DataProvider\DetailView\DefaultDetailViewProvider" />
+
+    <virtualType name="Emico\RobinHq\DataProvider\DetailView\DefaultDetailViewProvider" type="Emico\RobinHq\DataProvider\DetailView\AggregateProvider">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="details" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\OrderDetailViewProvider</item>
+                <item name="products" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\ProductDetailViewProvider</item>
+                <item name="totals" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\TotalDetailViewProvider</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Panel view provider -->
+    <preference for="Emico\RobinHq\DataProvider\PanelView\Customer\PanelViewProviderInterface" type="Emico\RobinHq\DataProvider\PanelView\CustomerPanelViewProvider" />
+
+    <virtualType name="Emico\RobinHq\DataProvider\PanelView\CustomerPanelViewProvider" type="Emico\RobinHq\DataProvider\PanelView\Customer\AggregateProvider">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="base" xsi:type="object">Emico\RobinHq\DataProvider\PanelView\Customer\BaseInfoProvider</item>
+                <item name="shipping_address" xsi:type="object">Emico\RobinHq\DataProvider\PanelView\Customer\ShippingAddressProvider</item>
+                <item name="custom_attributes" xsi:type="object">Emico\RobinHq\DataProvider\PanelView\Customer\CustomAttributesProvider</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- List view provider -->
+    <preference for="Emico\RobinHq\DataProvider\ListView\Order\ListViewProviderInterface" type="Emico\RobinHq\DataProvider\ListView\Order\NullProvider" />
+
+    <virtualType name="Emico\RobinHq\DataProvider\ListView\Order\CustomerOrdersListViewProvider" type="Emico\RobinHq\DataProvider\ListView\Order\BaseDataProvider" />
+
+    <!-- API endpoints -->
+    <type name="Emico\RobinHq\Controller\Api\Customer">
+        <arguments>
+            <argument name="dataProvider" xsi:type="object">Emico\RobinHq\DataProvider\CustomerDataProvider</argument>
+        </arguments>
+    </type>
+
+    <type name="Emico\RobinHq\Controller\Api\Order">
+        <arguments>
+            <argument name="dataProvider" xsi:type="object">Emico\RobinHq\DataProvider\OrderDataProvider</argument>
+        </arguments>
+    </type>
+
+    <type name="Emico\RobinHq\Controller\Api\CustomerOrders">
+        <arguments>
+            <argument name="dataProvider" xsi:type="object">Emico\RobinHq\DataProvider\CustomerOrdersDataProvider</argument>
+        </arguments>
+    </type>
+
+    <type name="Emico\RobinHq\Controller\Api\Search">
+        <arguments>
+            <argument name="dataProvider" xsi:type="object">Emico\RobinHq\DataProvider\SearchDataProvider</argument>
+        </arguments>
+    </type>
+
+    <type name="Emico\RobinHq\Controller\Api\Lifetime">
+        <arguments>
+            <argument name="dataProvider" xsi:type="object">Emico\RobinHq\DataProvider\CustomerLifetimeDataProvider</argument>
+        </arguments>
+    </type>
+
+    <!-- Source models -->
+    <virtualType name="Emico\RobinHq\Model\Config\Source\CustomerAttributes" type="Emico\RobinHq\Model\Config\Source\Attributes">
+        <arguments>
+            <argument name="entityType" xsi:type="string">customer</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Emico\RobinHq\Model\Config\Source\ProductAttributes" type="Emico\RobinHq\Model\Config\Source\Attributes">
+        <arguments>
+            <argument name="entityType" xsi:type="string">catalog_product</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Emico\RobinHq\Model\Config\Source\OrderAttributes" type="Emico\RobinHq\Model\Config\Source\Attributes">
+        <arguments>
+            <argument name="entityType" xsi:type="string">order</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Emico\RobinHqLib\Service\CustomerService">
+        <arguments>
+            <argument name="queue" xsi:type="object">Emico\RobinHq\Queue\EventPublisher</argument>
+        </arguments>
+    </type>
+
+    <type name="Emico\RobinHqLib\Service\EventProcessingService">
+        <arguments>
+            <argument name="eventProcessors" xsi:type="array">
+                <item name="customer" xsi:type="object">Emico\RobinHqLib\EventProcessor\CustomerEventProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Emico\RobinHq\Observer\OrderSaveAfterObserver">
+        <arguments>
+            <argument name="customerFactory" xsi:type="object">Emico\RobinHq\Mapper\SimpleCustomerFactory</argument>
+            <argument name="orderFactory" xsi:type="object">Emico\RobinHq\Mapper\SimpleOrderFactory</argument>
+        </arguments>
+    </type>
+
+    <preference for="Emico\RobinHqLib\Queue\QueueInterface" type="Emico\RobinHq\Queue\EventPublisher" />
+</config>

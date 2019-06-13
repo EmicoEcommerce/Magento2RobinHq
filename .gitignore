@@ -1,0 +1,7 @@
+# IDE & OS
+/.idea
+.svn
+.DS_Store
+._.DS_Store
+.DS_Store?
+Thumbs.db

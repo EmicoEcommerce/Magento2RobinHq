@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <tweakwise>
+            <api>
+                <key/>
+                <secret/>
+                <url>https://api.robinhq.com/</url>
+                <server_enabled>0</server_enabled>
+                <server_key/>
+                <server_secret/>
+            </api>
+        </tweakwise>
+    </default>
+</config>
