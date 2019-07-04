@@ -10,14 +10,17 @@ use function GuzzleHttp\Psr7\stream_for;
 use Magento\Framework\HTTP\PhpEnvironment\Request as MagentoRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\ServerRequest as PsrRequest;
-use Zend\Diactoros\Stream;
 use Zend\Diactoros\Uri;
 
 class RequestMapper
 {
+    /**
+     * @param MagentoRequest $magentoRequest
+     * @return ServerRequestInterface
+     */
     public function mapToPsrRequest(MagentoRequest $magentoRequest): ServerRequestInterface
     {
-        $psrRequest = (new PsrRequest())
+        $psrRequest = (new PsrRequest($magentoRequest->getServer()->toArray()))
             ->withMethod($magentoRequest->getMethod())
             ->withUri(new Uri($magentoRequest->getUri()->__toString()))
             ->withBody(stream_for($magentoRequest->getContent()))
@@ -27,6 +30,10 @@ class RequestMapper
         return $psrRequest;
     }
 
+    /**
+     * @param MagentoRequest $magentoRequest
+     * @param ServerRequestInterface $psrRequest
+     */
     protected function mapHeaders(MagentoRequest $magentoRequest, ServerRequestInterface $psrRequest)
     {
         foreach ($magentoRequest->getHeaders() as $header) {
