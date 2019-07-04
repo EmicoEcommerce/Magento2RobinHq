@@ -2,6 +2,7 @@
 namespace Emico\RobinHq\Controller\Api;
 
 use Emico\RobinHq\DataProvider\CustomerDataProvider;
+use Emico\RobinHq\Psr7Bridge\RequestMapper;
 use Emico\RobinHqLib\DataProvider\DataProviderInterface;
 use Emico\RobinHqLib\Server\RestApiServer;
 use Magento\Framework\App\Action\Action;
@@ -49,7 +50,13 @@ abstract class AbstractApi extends Action
      */
     public function execute()
     {
-        $request = ServerRequestFactory::fromGlobals();
+        $requestMapper = new RequestMapper();
+        //$request = ServerRequestFactory::fromGlobals();
+
+
+        //$request = $this->getRequest();
+
+        $request = $requestMapper->mapToPsrRequest($this->getRequest());
         $response = $this->restApiServer->handleRequest($request, $this->dataProvider);
         $this->mapPsrResponseToMagentoResponse($response);
     }
