@@ -51,11 +51,6 @@ abstract class AbstractApi extends Action
     public function execute()
     {
         $requestMapper = new RequestMapper();
-        //$request = ServerRequestFactory::fromGlobals();
-
-
-        //$request = $this->getRequest();
-
         $request = $requestMapper->mapToPsrRequest($this->getRequest());
         $response = $this->restApiServer->handleRequest($request, $this->dataProvider);
         $this->mapPsrResponseToMagentoResponse($response);
