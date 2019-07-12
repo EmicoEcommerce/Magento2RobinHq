@@ -37,7 +37,7 @@
                         <field id="post_enabled">1</field>
                     </depends>
                     <comment>url for the POST API</comment>
-                    <validate>required-entry validate-alphanum</validate>
+                    <validate>required-entry validate-url</validate>
                 </field>
                 <field id="server_enabled" translate="label,comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable dynamic API endpoints</label>
