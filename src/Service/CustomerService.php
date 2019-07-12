@@ -40,7 +40,7 @@ class CustomerService
      * @param CustomerInterface $customer
      * @return AddressInterface|null
      */
-    public function getShippingAddress(CustomerInterface $customer): ?AbstractAddress
+    public function getShippingAddress(CustomerInterface $customer): ?AddressInterface
     {
         foreach ($customer->getAddresses() as $address) {
             if ($address->isDefaultShipping()) {
