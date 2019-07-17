@@ -36,10 +36,17 @@ class OrderFactory
      * @var DetailViewProviderInterface
      */
     private $detailViewProvider;
+
     /**
      * @var ListViewProviderInterface
      */
     private $listViewProvider;
+
+    /**
+     * Keep track of first order entityID's per customer for performance
+     * @var array|OrderInterface[]
+     */
+    private $firstOrders = [];
 
     /**
      * OrderFactory constructor.
@@ -109,22 +116,26 @@ class OrderFactory
      */
     protected function isFirstOrder(OrderInterface $order): bool
     {
-        $customerId = $order->getCustomerId();
+        $customerEmail = $order->getCustomerEmail();
 
-        $sortOrder = $this->sortOrderBuilder
-            ->setField(OrderInterface::ENTITY_ID)
-            ->setAscendingDirection()
-            ->create();
-        
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(OrderInterface::CUSTOMER_ID, $customerId)
-            ->addSortOrder($sortOrder)
-            ->setPageSize(1)
-            ->create();
+        $firstOrder = $this->firstOrders[$customerEmail] ?? null;
+        if (!$firstOrder) {
+            $sortOrder = $this->sortOrderBuilder
+                ->setField(OrderInterface::ENTITY_ID)
+                ->setAscendingDirection()
+                ->create();
 
-        $customerOrders = $this->orderRepository->getList($searchCriteria)->getItems();
-        /** @var OrderInterface $firstOrder */
-        $firstOrder = current($customerOrders);
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(OrderInterface::CUSTOMER_EMAIL, $customerEmail)
+                ->addSortOrder($sortOrder)
+                ->setPageSize(1)
+                ->create();
+
+            $customerOrders = $this->orderRepository->getList($searchCriteria)->getItems();
+            /** @var OrderInterface $firstOrder */
+            $firstOrder = current($customerOrders);
+            $this->firstOrders[$customerEmail] = $firstOrder;
+        }
 
         return $firstOrder->getEntityId() === $order->getEntityId();
     }
