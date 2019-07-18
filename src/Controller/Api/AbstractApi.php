@@ -63,5 +63,10 @@ abstract class AbstractApi extends Action
     {
         $this->response->setBody($response->getBody());
         $this->response->setCustomStatusCode($response->getStatusCode());
+        foreach ($response->getHeaders() as $name => $values) {
+            foreach ($values as $value) {
+                $this->response->getHeaders()->addHeaderLine($name, $value);
+            }
+        }
     }
 }
