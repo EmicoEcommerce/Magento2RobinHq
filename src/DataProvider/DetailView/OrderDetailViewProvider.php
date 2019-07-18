@@ -63,7 +63,7 @@ class OrderDetailViewProvider implements DetailViewProviderInterface
             }
         }
 
-        $detailView = new DetailsView(DetailsView::DISPLAY_MODE_ROWS, $data);
+        $detailView = new DetailsView(DetailsView::DISPLAY_MODE_DETAILS, $data);
         $detailView->setCaption(__('details'));
         return [$detailView];
     }
