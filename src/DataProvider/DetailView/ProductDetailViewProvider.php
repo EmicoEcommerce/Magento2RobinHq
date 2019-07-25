@@ -58,6 +58,7 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
      * @var LoggerInterface
      */
     private $logger;
+
     /**
      * @var AttributeRetriever
      */
@@ -116,7 +117,7 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
             }
             $orderItemsData[] = $itemData;
         }
-        $detailView = new DetailsView(DetailsView::DISPLAY_MODE_COLUMNS, $orderItemsData);
+        $detailView = new DetailsView(DetailsView::DISPLAY_MODE_ROWS, $orderItemsData);
         $detailView->setCaption(__('products'));
         return [$detailView];
     }
