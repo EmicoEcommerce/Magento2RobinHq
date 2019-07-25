@@ -65,6 +65,11 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
     private $attributeRetriever;
 
     /**
+     * @var ProductDataProviderInterface
+     */
+    private $productDataProvider;
+
+    /**
      * ProductDetailViewProvider constructor.
      * @param PriceCurrencyInterface $priceCurrency
      * @param ProductRepositoryInterface $productRepository
@@ -73,6 +78,7 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
      * @param Config $moduleConfig
      * @param AttributeRetriever $attributeRetriever
      * @param LoggerInterface $logger
+     * @param ProductDataProviderInterface $productDataProvider
      */
     public function __construct(
         PriceCurrencyInterface $priceCurrency,
@@ -81,7 +87,8 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
         EavConfig $eavConfig,
         Config $moduleConfig,
         AttributeRetriever $attributeRetriever,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        ProductDataProviderInterface $productDataProvider
     ) {
         $this->priceCurrency = $priceCurrency;
         $this->moduleConfig = $moduleConfig;
@@ -90,6 +97,7 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
         $this->eavConfig = $eavConfig;
         $this->logger = $logger;
         $this->attributeRetriever = $attributeRetriever;
+        $this->productDataProvider = $productDataProvider;
     }
 
     /**
@@ -113,6 +121,7 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
                 $product = $item->getProduct();
                 if ($product) {
                     $itemData = array_merge($itemData, $this->getCustomProductAttributes($product));
+                    $itemData = array_merge($itemData, $this->productDataProvider->getAdditionalProductData($product));
                 }
             }
             $orderItemsData[] = $itemData;
