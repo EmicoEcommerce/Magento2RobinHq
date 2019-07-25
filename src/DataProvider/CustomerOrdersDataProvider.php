@@ -75,7 +75,7 @@ class CustomerOrdersDataProvider implements DataProviderInterface
 
         $sortOrder = $this->sortOrderBuilder
             ->setField(OrderInterface::CREATED_AT)
-            ->setAscendingDirection()
+            ->setDescendingDirection()
             ->create();
 
         $searchCriteria = $this->searchCriteriaBuilder
