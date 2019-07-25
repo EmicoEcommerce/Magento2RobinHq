@@ -52,7 +52,7 @@ class TotalDetailViewProvider implements DetailViewProviderInterface
             array_keys($detailViewData), $detailViewData
         );
 
-        $detailView = new DetailsView(DetailsView::DISPLAY_MODE_COLUMNS, $detailViewData);
+        $detailView = new DetailsView(DetailsView::DISPLAY_MODE_COLUMNS, [$detailViewData]);
         $detailView->setCaption(__('totals'));
         return [$detailView];
     }
