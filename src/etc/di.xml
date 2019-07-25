@@ -56,6 +56,7 @@
 
     <!-- Detail view providers -->
     <preference for="Emico\RobinHq\DataProvider\DetailView\DetailViewProviderInterface" type="Emico\RobinHq\DataProvider\DetailView\DefaultDetailViewProvider" />
+    <preference for="Emico\RobinHq\DataProvider\DetailView\ProductDataProviderInterface" type="Emico\RobinHq\DataProvider\DetailView\NullProductDataProvider" />
 
     <virtualType name="Emico\RobinHq\DataProvider\DetailView\DefaultDetailViewProvider" type="Emico\RobinHq\DataProvider\DetailView\AggregateProvider">
         <arguments>
