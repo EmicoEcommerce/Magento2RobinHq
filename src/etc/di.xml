@@ -61,6 +61,7 @@
         <arguments>
             <argument name="providers" xsi:type="array">
                 <item name="details" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\OrderDetailViewProvider</item>
+                <item name="shipping_address" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\ShippingAddressDetailViewProvider</item>
                 <item name="products" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\ProductDetailViewProvider</item>
                 <item name="totals" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\TotalDetailViewProvider</item>
             </argument>
