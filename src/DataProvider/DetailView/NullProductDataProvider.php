@@ -17,6 +17,6 @@ class NullProductDataProvider implements ProductDataProviderInterface
      */
     public function getAdditionalProductData(ProductInterface $product): array
     {
-        // TODO: Implement getAdditionalProductData() method.
+        return [];
     }
 }
