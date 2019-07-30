@@ -45,8 +45,7 @@ class ShippingAddressProvider implements PanelViewProviderInterface
         return [
             'street' => $street,
             'postalCode' => $address->getPostcode(),
-            'city' => $address->getCity(),
-            'telephone' => $address->getTelephone()
+            'city' => $address->getCity()
         ];
     }
 }
