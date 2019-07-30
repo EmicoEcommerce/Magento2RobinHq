@@ -103,6 +103,8 @@ class OrderSaveAfterObserver implements ObserverInterface
             return;
         }
 
+        $this->postOrderData($order);
+
         $customerId = $order->getCustomerId();
         if (!$customerId) {
             return;
@@ -116,7 +118,6 @@ class OrderSaveAfterObserver implements ObserverInterface
         }
 
         $this->postCustomerData($customer);
-        $this->postOrderData($order);
     }
 
     /**
