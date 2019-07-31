@@ -147,6 +147,7 @@
         <arguments>
             <argument name="eventProcessors" xsi:type="array">
                 <item name="customer" xsi:type="object">Emico\RobinHqLib\EventProcessor\CustomerEventProcessor</item>
+                <item name="order" xsi:type="object">Emico\RobinHqLib\EventProcessor\OrderEventProcessor</item>
             </argument>
         </arguments>
     </type>
