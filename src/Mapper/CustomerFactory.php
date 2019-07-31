@@ -118,6 +118,7 @@ class CustomerFactory
         /** @var OrderInterface $lastOrder */
         $lastOrder = end($customerOrders);
         $robinCustomer->setCurrency($lastOrder->getBaseCurrencyCode());
+        $robinCustomer->setLastOrderDate(new DateTimeImmutable($lastOrder->getCreatedAt()));
 
         $totalSpent = 0;
         foreach ($customerOrders as $order) {
