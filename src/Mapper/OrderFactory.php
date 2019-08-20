@@ -7,8 +7,12 @@ use Emico\RobinHq\DataProvider\ListView\Order\ListViewProviderInterface;
 use Emico\RobinHqLib\Model\Order;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrderBuilder;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * @author Bram Gerritsen <bgerritsen@emico.nl>
@@ -43,6 +47,11 @@ class OrderFactory
     private $listViewProvider;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * Keep track of first order entityID's per customer for performance
      * @var array|OrderInterface[]
      */
@@ -55,19 +64,22 @@ class OrderFactory
      * @param SortOrderBuilder $sortOrderBuilder
      * @param DetailViewProviderInterface $detailViewProvider
      * @param ListViewProviderInterface $listViewProvider
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         SortOrderBuilder $sortOrderBuilder,
         DetailViewProviderInterface $detailViewProvider,
-        ListViewProviderInterface $listViewProvider
+        ListViewProviderInterface $listViewProvider,
+        StoreManagerInterface $storeManager
     ) {
         $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->sortOrderBuilder = $sortOrderBuilder;
         $this->detailViewProvider = $detailViewProvider;
         $this->listViewProvider = $listViewProvider;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -84,6 +96,7 @@ class OrderFactory
         $robinOrder->setName($this->getCustomerFullName($order));
         $robinOrder->setEmailAddress($order->getCustomerEmail());
         $robinOrder->setFirstOrder($this->isFirstOrder($order));
+        $robinOrder->setWebstoreUrl($this->getStoreUrl($order));
 
         foreach ($this->detailViewProvider->getItems($order) as $item) {
             $robinOrder->addDetailsView($item);
@@ -138,5 +151,23 @@ class OrderFactory
         }
 
         return $firstOrder->getEntityId() === $order->getEntityId();
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @return string|null
+     */
+    private function getStoreUrl(OrderInterface $order): ?string
+    {
+        try {
+            $store = $this->storeManager->getStore($order->getStoreId());
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
+
+        if (!$store instanceof Store) {
+            return null;
+        }
+        return $store->getBaseUrl(UrlInterface::URL_TYPE_WEB);
     }
 }
