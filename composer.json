@@ -2,7 +2,7 @@
     "name": "emico/magento-2-robinhq",
     "description": "Magento 2 module for RobinHQ integration. Provides API endpoints for RobinHQ dynamic API",
     "require": {
-        "php": "~7.2.0",
+        "php": "^7.2.0",
         "emico/robinhq-lib": "^1.0",
         "zendframework/zend-diactoros": "^1.8",
         "webmozart/assert": "^1.4"
