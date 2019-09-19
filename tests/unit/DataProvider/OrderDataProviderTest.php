@@ -2,13 +2,15 @@
 
 namespace Emico\RobinHqTest\DataProvider;
 
-use Emico\RobinHq\DataProvider\CustomerDataProvider;
-use Emico\RobinHq\Mapper\CustomerFactory;
+use Emico\RobinHq\DataProvider\OrderDataProvider;
+use Emico\RobinHq\Mapper\OrderFactory;
 use Emico\RobinHqLib\DataProvider\DataProviderInterface;
 use Helper\Unit;
 use InvalidArgumentException;
-use Magento\Customer\Api\CustomerRepositoryInterface;
-use Emico\RobinHqLib\Model\Customer as RobinHqCustomerModel;
+use Emico\RobinHqLib\Model\Order as RobinHqOrderModel;
+use Magento\Framework\Api\SearchCriteria;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mockery;
 use Mockery\MockInterface;
@@ -29,36 +31,48 @@ class OrderDataProviderTest extends \Codeception\Test\Unit
 
     public function _before()
     {
-        /** @var CustomerRepositoryInterface|MockInterface $customerFactoryMock */
+        $searchCriteria = Mockery::mock(SearchCriteria::class);
+
+        $searchCriteriaBuilder = Mockery::mock(SearchCriteriaBuilder::class);
+        $searchCriteriaBuilder
+            ->shouldReceive('addFilter')
+            ->andReturnSelf();
+        $searchCriteriaBuilder
+            ->shouldReceive('create')
+            ->andReturn($searchCriteria);
+
+        /** @var OrderRepositoryInterface|MockInterface $orderRepositoryMock */
         $orderRepositoryMock = Mockery::mock(OrderRepositoryInterface::class);
         $order = $this->tester->createOrderFixture();
-        $orderRepositoryMock->shouldReceive('get')
-            ->with(Unit::ORDER_ENTITY_ID)
-            ->andReturn($order);
 
-        /** @var CustomerFactory|MockInterface $customerFactoryMock */
-        $customerFactoryMock = Mockery::mock(CustomerFactory::class);
-        $customerFactoryMock
-            ->shouldReceive('createRobinCustomer')
-            ->with($customer)
-            ->andReturn(new RobinHqCustomerModel(Unit::CUSTOMER_EMAIL));
+        $orderRepositoryMock->shouldReceive('getList')
+            ->with($searchCriteria)
+            ->andReturn(Mockery::mock(OrderSearchResultInterface::class, ['getItems' => [$order]]));
 
-        $this->dataProvider = new CustomerDataProvider(
-            $customerRepositoryMock,
-            $customerFactoryMock
+        /** @var OrderFactory|MockInterface $orderFactoryMock */
+        $orderFactoryMock = Mockery::mock(OrderFactory::class);
+        $orderFactoryMock
+            ->shouldReceive('createRobinOrder')
+            ->with($order)
+            ->andReturn(new RobinHqOrderModel(Unit::ORDER_INCREMENT_ID));
+
+        $this->dataProvider = new OrderDataProvider(
+            $orderRepositoryMock,
+            $searchCriteriaBuilder,
+            $orderFactoryMock
         );
     }
 
-    public function testFetchDataReturnsCustomerData(): void
+    public function testFetchDataReturnsOrderData(): void
     {
         $request = new ServerRequest();
-        $request = $request->withQueryParams(['email' => Unit::CUSTOMER_EMAIL]);
+        $request = $request->withQueryParams(['orderNumber' => Unit::ORDER_INCREMENT_ID]);
 
         $result = $this->dataProvider->fetchData($request);
-        $this->assertInstanceOf(RobinHqCustomerModel::class, $result);
+        $this->assertInstanceOf(RobinHqOrderModel::class, $result);
     }
 
-    public function testFetchDataThrowsExceptionWhenOmittingEmail(): void
+    public function testFetchDataThrowsExceptionWhenOmittingOrderNumber(): void
     {
         $this->expectException(InvalidArgumentException::class);
 

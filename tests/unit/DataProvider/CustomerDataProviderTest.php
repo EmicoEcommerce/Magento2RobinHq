@@ -8,7 +8,6 @@ use Emico\RobinHqLib\DataProvider\DataProviderInterface;
 use Helper\Unit;
 use InvalidArgumentException;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Api\Data\CustomerInterface;
 use Emico\RobinHqLib\Model\Customer as RobinHqCustomerModel;
 use Mockery;
 use Mockery\MockInterface;

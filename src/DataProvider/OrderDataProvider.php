@@ -6,6 +6,7 @@
 
 namespace Emico\RobinHq\DataProvider;
 
+use function count;
 use Emico\RobinHq\Mapper\OrderFactory;
 use Emico\RobinHqLib\DataProvider\DataProviderInterface;
 use Emico\RobinHqLib\DataProvider\Exception\DataNotFoundException;
@@ -66,11 +67,11 @@ class OrderDataProvider implements DataProviderInterface
             ->addFilter('increment_id', $queryParams['orderNumber'])
             ->create();
         $orderList = $this->orderRepository->getList($searchCriteria)->getItems();
-        if (\count($orderList) === 0) {
+        if (count($orderList) === 0) {
             throw new DataNotFoundException(sprintf('Could not find order with number %s.', $queryParams['orderNumber']));
         }
         $order = current($orderList);
         
-        return $this->orderFactory->createRobinOrder($order, true);
+        return $this->orderFactory->createRobinOrder($order);
     }
 }

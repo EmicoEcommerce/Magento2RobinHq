@@ -12,7 +12,6 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Sales\Model\Order;
 use Mockery;
-use Mockery\Mock;
 use Mockery\MockInterface;
 use UnitTester;
 

@@ -2,21 +2,11 @@
 
 namespace Emico\RobinHqTest\DataProvider;
 
-use Emico\RobinHq\DataProvider\CustomerDataProvider;
 use Emico\RobinHq\DataProvider\DetailView\OrderDetailViewProvider;
-use Emico\RobinHq\Mapper\CustomerFactory;
-use Emico\RobinHqLib\DataProvider\DataProviderInterface;
 use Emico\RobinHqLib\Model\Order\DetailsView;
 use Helper\Unit;
-use InvalidArgumentException;
-use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Api\Data\CustomerInterface;
-use Emico\RobinHqLib\Model\Customer as RobinHqCustomerModel;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use Mockery;
-use Mockery\MockInterface;
 use UnitTester;
-use Zend\Diactoros\ServerRequest;
 
 class OrderDetailViewProviderTest extends \Codeception\Test\Unit
 {
@@ -51,7 +41,5 @@ class OrderDetailViewProviderTest extends \Codeception\Test\Unit
         $this->assertEquals('10-01-2020', $data['orderdate']);
         $this->assertEquals(Unit::ORDER_INCREMENT_ID, $data['ordernumber']);
         $this->assertEquals(Unit::ORDER_PAYMENT_METHOD, $data['payment method']);
-        $this->assertEquals(Unit::ORDER_STATE, $data)
-        exit('henk');
     }
 }
