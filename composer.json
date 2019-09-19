@@ -4,6 +4,8 @@
     "require": {
         "php": "^7.2.0",
         "emico/robinhq-lib": "^1.0",
+        "magento/module-customer": "101.*|102.*",
+        "magento/framework": ">=100.1.0,<=100.1.16|>=101.0.0,<=101.0.8|>=102.0.0,<=102.0.1",
         "zendframework/zend-diactoros": "^1.8",
         "webmozart/assert": "^1.4"
     },
@@ -14,6 +16,16 @@
         ],
         "psr-4": {
             "Emico\\RobinHq\\": "src"
+        }
+    },
+    "require-dev": {
+        "codeception/codeception": "^3.1",
+        "mockery/mockery": "^1.2"
+    },
+    "repositories": {
+        "magento": {
+            "type": "composer",
+            "url": "https://repo.magento.com/"
         }
     }
 }

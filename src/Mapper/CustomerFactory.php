@@ -27,6 +27,7 @@ class CustomerFactory
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
+
     /**
      * @var PanelViewProviderInterface
      */
@@ -42,6 +43,7 @@ class CustomerFactory
      * @param OrderRepositoryInterface $orderRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param PanelViewProviderInterface $panelViewProvider
+     * @param CustomerService $customerService
      */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -118,7 +120,10 @@ class CustomerFactory
         /** @var OrderInterface $lastOrder */
         $lastOrder = end($customerOrders);
         $robinCustomer->setCurrency($lastOrder->getBaseCurrencyCode());
-        $robinCustomer->setLastOrderDate(new DateTimeImmutable($lastOrder->getCreatedAt()));
+        try {
+            $robinCustomer->setLastOrderDate(new DateTimeImmutable($lastOrder->getCreatedAt()));
+        } catch (\Exception $e) {
+        }
 
         $totalSpent = 0;
         foreach ($customerOrders as $order) {
