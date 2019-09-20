@@ -7,4 +7,4 @@ before_script:
   - composer install --no-plugins
 
 script:
-  - vendor/bin/codecept run
+  - vendor/bin/codecept run unit
