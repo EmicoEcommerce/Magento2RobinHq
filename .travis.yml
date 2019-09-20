@@ -6,6 +6,5 @@ before_script:
   - composer config -a -g http-basic.repo.magento.com $MAGENTO_USERNAME $MAGENTO_PASSWORD
   - composer install --no-plugins
 
-test:
-  script:
-    - vendor/bin/codecept run
+script:
+  - vendor/bin/codecept run
