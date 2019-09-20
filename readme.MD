@@ -1,5 +1,8 @@
 # Magento 2 RobinHQ module
-Providers API integrations with the RobinHQ platform / dashboards
+
+[![Build Status](https://travis-ci.com/EmicoEcommerce/Magento2RobinHq.svg?branch=master)](https://travis-ci.com/EmicoEcommerce/Magento2RobinHq)
+
+Provides API integrations with the RobinHQ platform / dashboards
 
 ## Installation
 Install package using composer
