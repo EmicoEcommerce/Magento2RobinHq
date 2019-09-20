@@ -35,31 +35,6 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
     private $moduleConfig;
 
     /**
-     * @var array
-     */
-    private $products;
-
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var EavConfig
-     */
-    private $eavConfig;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * @var AttributeRetriever
      */
     private $attributeRetriever;
@@ -72,30 +47,18 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
     /**
      * ProductDetailViewProvider constructor.
      * @param PriceCurrencyInterface $priceCurrency
-     * @param ProductRepositoryInterface $productRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param EavConfig $eavConfig
      * @param Config $moduleConfig
      * @param AttributeRetriever $attributeRetriever
-     * @param LoggerInterface $logger
      * @param ProductDataProviderInterface $productDataProvider
      */
     public function __construct(
         PriceCurrencyInterface $priceCurrency,
-        ProductRepositoryInterface $productRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        EavConfig $eavConfig,
         Config $moduleConfig,
         AttributeRetriever $attributeRetriever,
-        LoggerInterface $logger,
         ProductDataProviderInterface $productDataProvider
     ) {
         $this->priceCurrency = $priceCurrency;
         $this->moduleConfig = $moduleConfig;
-        $this->productRepository = $productRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->eavConfig = $eavConfig;
-        $this->logger = $logger;
         $this->attributeRetriever = $attributeRetriever;
         $this->productDataProvider = $productDataProvider;
     }
@@ -132,44 +95,15 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
     }
 
     /**
-     * @param OrderInterface $order
-     * @param OrderItemInterface $orderItem
-     * @return ProductInterface|null
-     */
-    protected function getProductFromOrderItem(OrderInterface $order, OrderItemInterface $orderItem): ?ProductInterface
-    {
-        if ($this->products === null) {
-            $productIds = array_map(
-                function (OrderItemInterface $item) {
-                    return $item->getProductId();
-                },
-                $order->getItems()
-            );
-            $productIds = array_unique($productIds);
-
-            $searchCriteria = $this->searchCriteriaBuilder
-                ->addFilter('entity_id', $productIds, 'in')
-                ->create();
-
-            $products = $this->productRepository->getList($searchCriteria)->getItems();
-            foreach ($products as $product) {
-                $this->products[$product->getId()] = $product;
-            }
-        }
-
-        return $this->products[$orderItem->getProductId()] ?? null;
-    }
-
-    /**
      * @param ProductInterface $product
      * @return array
      */
     protected function getCustomProductAttributes(ProductInterface $product): array
     {
-        $attributeCodes = $this->moduleConfig->getProductAttributes();
         if (!$product instanceof Product) {
             return [];
         }
+        $attributeCodes = $this->moduleConfig->getProductAttributes();
 
         $result = [];
         foreach ($attributeCodes as $code) {

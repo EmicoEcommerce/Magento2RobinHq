@@ -27,6 +27,7 @@ class CustomerFactory
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
+
     /**
      * @var PanelViewProviderInterface
      */
@@ -42,6 +43,7 @@ class CustomerFactory
      * @param OrderRepositoryInterface $orderRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param PanelViewProviderInterface $panelViewProvider
+     * @param CustomerService $customerService
      */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -58,14 +60,12 @@ class CustomerFactory
     /**
      * @param CustomerInterface $customer
      * @return Customer
+     * @throws \Exception
      */
     public function createRobinCustomer(CustomerInterface $customer): Customer
     {
         $robinCustomer = new Customer($customer->getEmail());
-        try {
-            $robinCustomer->setCustomerSince(new DateTimeImmutable($customer->getCreatedAt()));
-        } catch (\Exception $e) {
-        }
+        $robinCustomer->setCustomerSince(new DateTimeImmutable($customer->getCreatedAt()));
         $robinCustomer->setName($this->getFullName($customer));
 
         foreach ($this->panelViewProvider->getData($customer) as $label => $value) {
@@ -99,6 +99,7 @@ class CustomerFactory
     /**
      * @param CustomerInterface $customer
      * @param Customer $robinCustomer
+     * @throws \Exception
      */
     protected function addOrderInformation(CustomerInterface $customer, Customer $robinCustomer): void
     {

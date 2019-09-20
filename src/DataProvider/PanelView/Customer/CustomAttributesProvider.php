@@ -55,10 +55,15 @@ class CustomAttributesProvider implements PanelViewProviderInterface
             return [];
         }
 
+        $customAttributesToRetrieve = $this->moduleConfig->getCustomerAttributes();
+        if (!$customAttributesToRetrieve) {
+            return [];
+        }
+
         $panelData = [];
-        //@todo move to AttributeRetriever. Even met stijn overlegen hoe dit generiek te maken.
+
         $customerData = $customer->__toArray();
-        foreach ($this->moduleConfig->getCustomerAttributes() as $attributeCode) {
+        foreach ($customAttributesToRetrieve as $attributeCode) {
             try {
                 $attributeConfig = $this->eavConfig->getAttribute(\Magento\Customer\Model\Customer::ENTITY, $attributeCode);
             } catch (LocalizedException $e) {

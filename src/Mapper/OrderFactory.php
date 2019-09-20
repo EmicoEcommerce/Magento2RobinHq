@@ -96,7 +96,10 @@ class OrderFactory
         $robinOrder->setName($this->getCustomerFullName($order));
         $robinOrder->setEmailAddress($order->getCustomerEmail());
         $robinOrder->setFirstOrder($this->isFirstOrder($order));
-        $robinOrder->setWebstoreUrl($this->getStoreUrl($order));
+        $storeUrl = $this->getStoreUrl($order);
+        if ($storeUrl) {
+            $robinOrder->setWebstoreUrl($storeUrl);
+        }
 
         foreach ($this->detailViewProvider->getItems($order) as $item) {
             $robinOrder->addDetailsView($item);
