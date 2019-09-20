@@ -418,16 +418,16 @@
         },
         {
             "name": "emico/robinhq-lib",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EmicoEcommerce/RobinHqLib.git",
-                "reference": "218afe85f689da85134ed289e07aa0eaed815c40"
+                "reference": "5c735b2f3d2786e4c25155c4557096c7798ebea6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EmicoEcommerce/RobinHqLib/zipball/218afe85f689da85134ed289e07aa0eaed815c40",
-                "reference": "218afe85f689da85134ed289e07aa0eaed815c40",
+                "url": "https://api.github.com/repos/EmicoEcommerce/RobinHqLib/zipball/5c735b2f3d2786e4c25155c4557096c7798ebea6",
+                "reference": "5c735b2f3d2786e4c25155c4557096c7798ebea6",
                 "shasum": ""
             },
             "require": {
@@ -448,7 +448,7 @@
                 "OSL-3.0"
             ],
             "description": "Robin HQ library",
-            "time": "2019-08-20T08:03:37+00:00"
+            "time": "2019-09-20T10:03:27+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
