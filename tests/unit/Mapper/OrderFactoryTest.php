@@ -15,9 +15,12 @@ use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Api\SortOrderBuilder;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Mockery;
 use UnitTester;
 
@@ -49,6 +52,11 @@ class OrderFactoryTest extends \Codeception\Test\Unit
     private $listViewProviderMock;
 
     /**
+     * @var StoreManagerInterface|Mockery\LegacyMockInterface|Mockery\MockInterface
+     */
+    private $storeManagerMock;
+
+    /**
      * @var UnitTester
      */
     protected $tester;
@@ -64,13 +72,12 @@ class OrderFactoryTest extends \Codeception\Test\Unit
         ]);
 
         $searchCriteriaBuilderMock = Mockery::mock(SearchCriteriaBuilder::class);
-        $searchCriteriaBuilderMock
-            ->allows([
-                'setPageSize' => $searchCriteriaBuilderMock,
-                'addFilter' => $searchCriteriaBuilderMock,
-                'addSortOrder' => $searchCriteriaBuilderMock,
-                'create' => Mockery::mock(SearchCriteria::class)
-            ]);
+        $searchCriteriaBuilderMock->allows([
+            'setPageSize' => $searchCriteriaBuilderMock,
+            'addFilter' => $searchCriteriaBuilderMock,
+            'addSortOrder' => $searchCriteriaBuilderMock,
+            'create' => Mockery::mock(SearchCriteria::class)
+        ]);
 
         $sortOrderBuilderMock = Mockery::mock(SortOrderBuilder::class);
         $sortOrderBuilderMock->allows([
@@ -82,15 +89,19 @@ class OrderFactoryTest extends \Codeception\Test\Unit
         $this->objectManager = new ObjectManager($this);
 
         $this->listViewProviderMock = Mockery::mock(ListViewProviderInterface::class);
-        $this->listViewProviderMock
-            ->shouldReceive('getData')
-            ->andReturn([])
-            ->byDefault();
+        $this->listViewProviderMock->allows([
+            'getData' => []
+        ])->byDefault();
 
         $this->detailsViewProviderMock = Mockery::mock(DetailViewProviderInterface::class);
-        $this->detailsViewProviderMock
-            ->shouldReceive('getItems')
-            ->andReturn([])
+        $this->detailsViewProviderMock->allows([
+            'getItems' => []
+        ])->byDefault();
+
+        $this->storeManagerMock = Mockery::mock(StoreManagerInterface::class);
+        $this->storeManagerMock
+            ->shouldReceive('getStore')
+            ->andThrow(new NoSuchEntityException(__()))
             ->byDefault();
 
         $this->orderFactory = $this->objectManager->getObject(
@@ -100,7 +111,8 @@ class OrderFactoryTest extends \Codeception\Test\Unit
                 'searchCriteriaBuilder' => $searchCriteriaBuilderMock,
                 'sortOrderBuilder' => $sortOrderBuilderMock,
                 'listViewProvider' => $this->listViewProviderMock,
-                'detailViewProvider' => $this->detailsViewProviderMock
+                'detailViewProvider' => $this->detailsViewProviderMock,
+                'storeManager' => $this->storeManagerMock
             ]
         );
     }
@@ -158,5 +170,33 @@ class OrderFactoryTest extends \Codeception\Test\Unit
 
         // Assert
         $this->assertEquals($detailViews, $robinOrder->getDetailsView());
+    }
+
+    public function testCanExtractStoreUrl()
+    {
+        // Setup fixtures/mocks
+        $orderFixture = $this->tester->createOrderFixture();
+
+        $this->storeManagerMock->allows(['getStore' => $this->tester->createStoreFixture()]);
+
+        // Map data
+        $robinOrder = $this->orderFactory->createRobinOrder($orderFixture);
+
+        // Assert
+        $this->assertEquals(Unit::STORE_BASE_URL, $robinOrder->getWebstoreUrl());
+    }
+
+    public function testNoWebstoreUrlIsReturnedWhenNotInstanceOfStore()
+    {
+        // Setup fixtures/mocks
+        $orderFixture = $this->tester->createOrderFixture();
+
+        $this->storeManagerMock->allows(['getStore' => $this->tester->createStoreFixture([], StoreInterface::class)]);
+
+        // Map data
+        $robinOrder = $this->orderFactory->createRobinOrder($orderFixture);
+
+        // Assert
+        $this->assertNull($robinOrder->getWebstoreUrl());
     }
 }

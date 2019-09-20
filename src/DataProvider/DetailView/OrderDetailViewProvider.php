@@ -53,9 +53,9 @@ class OrderDetailViewProvider implements DetailViewProviderInterface
             __('payment method')->render() => $order->getPayment() ? $order->getPayment()->getMethod() : 'Unknown'
         ];
 
-        $data = array_merge($data, $this->getCustomOrderAttributes($order));
-
         if ($order instanceof Order) {
+            $data = array_merge($data, $this->getCustomOrderAttributes($order));
+
             /** @var InvoiceInterface $lastInvoice */
             $lastInvoice = $order->getInvoiceCollection()->getLastItem();
             if ($lastInvoice->getEntityId()) {
@@ -75,9 +75,6 @@ class OrderDetailViewProvider implements DetailViewProviderInterface
     protected function getCustomOrderAttributes(OrderInterface $order): array
     {
         $attributeCodes = $this->moduleConfig->getOrderAttributes();
-        if (!$order instanceof Order) {
-            return [];
-        }
 
         $result = [];
         foreach ($attributeCodes as $code) {

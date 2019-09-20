@@ -3,9 +3,7 @@
 namespace Emico\RobinHq\Queue;
 
 use Emico\RobinHqLib\Queue\QueueInterface;
-use Emico\TweakwisePim\Queue\Message\UpdateMessage;
 use Magento\Framework\MessageQueue\PublisherInterface;
-use Psr\Log\LoggerInterface;
 
 class EventPublisher implements QueueInterface
 {

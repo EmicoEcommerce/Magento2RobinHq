@@ -5,10 +5,12 @@ namespace Emico\RobinHqTest\DataProvider;
 use Emico\RobinHq\DataProvider\CustomerDataProvider;
 use Emico\RobinHq\Mapper\CustomerFactory;
 use Emico\RobinHqLib\DataProvider\DataProviderInterface;
+use Emico\RobinHqLib\DataProvider\Exception\DataNotFoundException;
 use Helper\Unit;
 use InvalidArgumentException;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Emico\RobinHqLib\Model\Customer as RobinHqCustomerModel;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Mockery;
 use Mockery\MockInterface;
 use UnitTester;
@@ -26,14 +28,20 @@ class CustomerDataProviderTest extends \Codeception\Test\Unit
      */
     protected $tester;
 
+    /**
+     * @var CustomerRepositoryInterface|Mockery\LegacyMockInterface|MockInterface
+     */
+    private $customerRepositoryMock;
+
     public function _before()
     {
         /** @var CustomerRepositoryInterface|MockInterface $customerFactoryMock */
-        $customerRepositoryMock = Mockery::mock(CustomerRepositoryInterface::class);
+        $this->customerRepositoryMock = Mockery::mock(CustomerRepositoryInterface::class);
         $customer = $this->tester->createCustomerFixture();
-        $customerRepositoryMock->shouldReceive('get')
+        $this->customerRepositoryMock->shouldReceive('get')
             ->with(Unit::CUSTOMER_EMAIL)
-            ->andReturn($customer);
+            ->andReturn($customer)
+            ->byDefault();
 
         /** @var CustomerFactory|MockInterface $customerFactoryMock */
         $customerFactoryMock = Mockery::mock(CustomerFactory::class);
@@ -43,7 +51,7 @@ class CustomerDataProviderTest extends \Codeception\Test\Unit
             ->andReturn(new RobinHqCustomerModel(Unit::CUSTOMER_EMAIL));
 
         $this->dataProvider = new CustomerDataProvider(
-            $customerRepositoryMock,
+            $this->customerRepositoryMock,
             $customerFactoryMock
         );
     }
@@ -62,6 +70,20 @@ class CustomerDataProviderTest extends \Codeception\Test\Unit
         $this->expectException(InvalidArgumentException::class);
 
         $request = new ServerRequest();
+
+        $this->dataProvider->fetchData($request);
+    }
+
+    public function testNotFoundExceptionIsThrownWhenCustomerDoesNotExist()
+    {
+        $this->expectException(DataNotFoundException::class);
+
+        $this->customerRepositoryMock->shouldReceive('get')
+            ->with(Unit::CUSTOMER_EMAIL)
+            ->andThrow(new NoSuchEntityException(__()));
+
+        $request = new ServerRequest();
+        $request = $request->withQueryParams(['email' => Unit::CUSTOMER_EMAIL]);
 
         $this->dataProvider->fetchData($request);
     }

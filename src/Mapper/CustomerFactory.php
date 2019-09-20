@@ -60,14 +60,12 @@ class CustomerFactory
     /**
      * @param CustomerInterface $customer
      * @return Customer
+     * @throws \Exception
      */
     public function createRobinCustomer(CustomerInterface $customer): Customer
     {
         $robinCustomer = new Customer($customer->getEmail());
-        try {
-            $robinCustomer->setCustomerSince(new DateTimeImmutable($customer->getCreatedAt()));
-        } catch (\Exception $e) {
-        }
+        $robinCustomer->setCustomerSince(new DateTimeImmutable($customer->getCreatedAt()));
         $robinCustomer->setName($this->getFullName($customer));
 
         foreach ($this->panelViewProvider->getData($customer) as $label => $value) {
@@ -101,6 +99,7 @@ class CustomerFactory
     /**
      * @param CustomerInterface $customer
      * @param Customer $robinCustomer
+     * @throws \Exception
      */
     protected function addOrderInformation(CustomerInterface $customer, Customer $robinCustomer): void
     {
@@ -120,10 +119,7 @@ class CustomerFactory
         /** @var OrderInterface $lastOrder */
         $lastOrder = end($customerOrders);
         $robinCustomer->setCurrency($lastOrder->getBaseCurrencyCode());
-        try {
-            $robinCustomer->setLastOrderDate(new DateTimeImmutable($lastOrder->getCreatedAt()));
-        } catch (\Exception $e) {
-        }
+        $robinCustomer->setLastOrderDate(new DateTimeImmutable($lastOrder->getCreatedAt()));
 
         $totalSpent = 0;
         foreach ($customerOrders as $order) {

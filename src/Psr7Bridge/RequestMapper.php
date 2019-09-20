@@ -26,18 +26,19 @@ class RequestMapper
             ->withBody(stream_for($magentoRequest->getContent()))
             ->withQueryParams($magentoRequest->getQuery()->toArray());
 
-        $this->mapHeaders($magentoRequest, $psrRequest);
-        return $psrRequest;
+        return $this->mapHeaders($magentoRequest, $psrRequest);
     }
 
     /**
      * @param MagentoRequest $magentoRequest
      * @param ServerRequestInterface $psrRequest
+     * @return ServerRequestInterface
      */
-    protected function mapHeaders(MagentoRequest $magentoRequest, ServerRequestInterface $psrRequest)
+    protected function mapHeaders(MagentoRequest $magentoRequest, ServerRequestInterface $psrRequest): ServerRequestInterface
     {
         foreach ($magentoRequest->getHeaders() as $header) {
             $psrRequest = $psrRequest->withAddedHeader($header->getFieldName(), $header->getFieldValue());
         }
+        return $psrRequest;
     }
 }

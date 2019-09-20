@@ -3,10 +3,13 @@ namespace Emico\RobinHq\Controller\Api;
 
 use Emico\RobinHq\DataProvider\CustomerDataProvider;
 use Emico\RobinHq\Psr7Bridge\RequestMapper;
+use Emico\RobinHq\Psr7Bridge\ResponseMapper;
 use Emico\RobinHqLib\DataProvider\DataProviderInterface;
 use Emico\RobinHqLib\Server\RestApiServer;
+use InvalidArgumentException;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\ServerRequestFactory;
 use Magento\Framework\App\Response\Http as ResponseHttp;
@@ -27,22 +30,37 @@ abstract class AbstractApi extends Action
     private $dataProvider;
 
     /**
+     * @var RequestMapper
+     */
+    private $requestMapper;
+    /**
+     * @var ResponseMapper
+     */
+    private $responseMapper;
+
+    /**
      * Customer constructor.
      * @param Context $context
      * @param RestApiServer $restApiServer
      * @param DataProviderInterface $dataProvider
      * @param ResponseHttp $response
+     * @param RequestMapper $requestMapper
+     * @param ResponseMapper $responseMapper
      */
     public function __construct(
         Context $context,
         RestApiServer $restApiServer,
         DataProviderInterface $dataProvider,
-        ResponseHttp $response
+        ResponseHttp $response,
+        RequestMapper $requestMapper,
+        ResponseMapper $responseMapper
     ) {
         parent::__construct($context);
         $this->restApiServer = $restApiServer;
         $this->response = $response;
         $this->dataProvider = $dataProvider;
+        $this->requestMapper = $requestMapper;
+        $this->responseMapper = $responseMapper;
     }
 
     /**
@@ -50,23 +68,13 @@ abstract class AbstractApi extends Action
      */
     public function execute()
     {
-        $requestMapper = new RequestMapper();
-        $request = $requestMapper->mapToPsrRequest($this->getRequest());
-        $response = $this->restApiServer->handleRequest($request, $this->dataProvider);
-        $this->mapPsrResponseToMagentoResponse($response);
-    }
-
-    /**
-     * @param ResponseInterface $response
-     */
-    protected function mapPsrResponseToMagentoResponse(ResponseInterface $response): void
-    {
-        $this->response->setBody($response->getBody());
-        $this->response->setCustomStatusCode($response->getStatusCode());
-        foreach ($response->getHeaders() as $name => $values) {
-            foreach ($values as $value) {
-                $this->response->getHeaders()->addHeaderLine($name, $value);
-            }
+        $request = $this->getRequest();
+        if (!$request instanceof Request) {
+            throw new InvalidArgumentException('Can only dispatch PhpEnvironment requests');
         }
+
+        $request = $this->requestMapper->mapToPsrRequest($request);
+        $response = $this->restApiServer->handleRequest($request, $this->dataProvider);
+        $this->responseMapper->mapPsrToMagentoResponse($response, $this->response);
     }
 }

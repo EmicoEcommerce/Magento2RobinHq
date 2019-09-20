@@ -17,6 +17,7 @@ class Attributes implements OptionSourceInterface
      * @var Config
      */
     private $eavConfig;
+
     /**
      * @var string
      */

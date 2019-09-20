@@ -1,7 +1,8 @@
 <?php
 
-namespace Emico\RobinHqTest\DataProvider;
+namespace Emico\RobinHqTest\Queue;
 
+use Codeception\Test\Unit;
 use Emico\RobinHq\Queue\EventConsumer;
 use Emico\RobinHqLib\Service\EventProcessingService;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
@@ -9,7 +10,7 @@ use Mockery;
 use Mockery\MockInterface;
 use UnitTester;
 
-class EventConsumerTest extends \Codeception\Test\Unit
+class EventConsumerTest extends Unit
 {
     /**
      * @var UnitTester

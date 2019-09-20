@@ -5,6 +5,7 @@ namespace Emico\RobinHqTest\DataProvider;
 use Emico\RobinHq\DataProvider\OrderDataProvider;
 use Emico\RobinHq\Mapper\OrderFactory;
 use Emico\RobinHqLib\DataProvider\DataProviderInterface;
+use Emico\RobinHqLib\DataProvider\Exception\DataNotFoundException;
 use Helper\Unit;
 use InvalidArgumentException;
 use Emico\RobinHqLib\Model\Order as RobinHqOrderModel;
@@ -29,6 +30,11 @@ class OrderDataProviderTest extends \Codeception\Test\Unit
      */
     protected $tester;
 
+    /**
+     * @var OrderRepositoryInterface|Mockery\LegacyMockInterface|MockInterface
+     */
+    private $orderRepositoryMock;
+
     public function _before()
     {
         $searchCriteria = Mockery::mock(SearchCriteria::class);
@@ -42,12 +48,13 @@ class OrderDataProviderTest extends \Codeception\Test\Unit
             ->andReturn($searchCriteria);
 
         /** @var OrderRepositoryInterface|MockInterface $orderRepositoryMock */
-        $orderRepositoryMock = Mockery::mock(OrderRepositoryInterface::class);
+        $this->orderRepositoryMock = Mockery::mock(OrderRepositoryInterface::class);
         $order = $this->tester->createOrderFixture();
 
-        $orderRepositoryMock->shouldReceive('getList')
+        $this->orderRepositoryMock->shouldReceive('getList')
             ->with($searchCriteria)
-            ->andReturn(Mockery::mock(OrderSearchResultInterface::class, ['getItems' => [$order]]));
+            ->andReturn(Mockery::mock(OrderSearchResultInterface::class, ['getItems' => [$order]]))
+            ->byDefault();
 
         /** @var OrderFactory|MockInterface $orderFactoryMock */
         $orderFactoryMock = Mockery::mock(OrderFactory::class);
@@ -57,7 +64,7 @@ class OrderDataProviderTest extends \Codeception\Test\Unit
             ->andReturn(new RobinHqOrderModel(Unit::ORDER_INCREMENT_ID));
 
         $this->dataProvider = new OrderDataProvider(
-            $orderRepositoryMock,
+            $this->orderRepositoryMock,
             $searchCriteriaBuilder,
             $orderFactoryMock
         );
@@ -77,6 +84,19 @@ class OrderDataProviderTest extends \Codeception\Test\Unit
         $this->expectException(InvalidArgumentException::class);
 
         $request = new ServerRequest();
+
+        $this->dataProvider->fetchData($request);
+    }
+
+    public function testExceptionIsThrownWhenNoCustomerOrdersAreFound()
+    {
+        $this->expectException(DataNotFoundException::class);
+
+        $this->orderRepositoryMock->shouldReceive('getList')
+            ->andReturn(Mockery::mock(OrderSearchResultInterface::class, ['getItems' => []]));
+
+        $request = new ServerRequest();
+        $request = $request->withQueryParams(['orderNumber' => Unit::ORDER_INCREMENT_ID]);
 
         $this->dataProvider->fetchData($request);
     }

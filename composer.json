@@ -5,10 +5,13 @@
         "php": "^7.2.0",
         "emico/robinhq-lib": "^1.0",
         "magento/module-customer": "101.*|102.*",
+        "magento/module-catalog": "102.*|103.*",
+        "magento/module-message-queue": "100.*",
+        "magento/framework-message-queue": "100.3.*",
         "magento/framework": ">=100.1.0,<=100.1.16|>=101.0.0,<=101.0.8|>=102.0.0,<=102.0.1",
         "zendframework/zend-diactoros": "^1.8",
         "webmozart/assert": "^1.4",
-        "ext-json": ",*"
+        "ext-json": "*"
     },
     "type": "magento2-module",
     "autoload": {

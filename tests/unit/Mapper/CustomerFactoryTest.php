@@ -95,7 +95,7 @@ class CustomerFactoryTest extends \Codeception\Test\Unit
 
         // Assert
         $this->assertEquals(Unit::CUSTOMER_EMAIL, $robinCustomer->getEmailAddress());
-        $this->assertEquals(Unit::CUSTOMER_FIRSTNAME . ' ' . Unit::CUSTOMER_LASTNAME, $robinCustomer->getName());
+        $this->assertEquals(Unit::CUSTOMER_FULLNAME, $robinCustomer->getName());
         $this->assertEquals(Unit::ADDRESS_PHONE, $robinCustomer->getPhoneNumber());
         $this->assertEquals(0, $robinCustomer->getOrderCount());
     }
