@@ -3,6 +3,7 @@ sudo: false
 image: php:7.2
 
 before_script:
+  - composer config -a -g http-basic.repo.magento.com $MAGENTO_USERNAME $MAGENTO_PASSWORD
   - composer install
 
 test:
