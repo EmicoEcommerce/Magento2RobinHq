@@ -100,7 +100,7 @@ class OrderSaveAfterObserver implements ObserverInterface
         $order = $observer->getData('order');
         $statesToProcess = [Order::STATE_PROCESSING, Order::STATE_COMPLETE, Order::STATE_CLOSED];
         if (!$order || !\in_array($order->getState(), $statesToProcess, true)) {
-            //return;
+            return;
         }
 
         $this->postOrderData($order);
