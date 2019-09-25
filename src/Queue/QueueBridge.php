@@ -5,6 +5,7 @@ namespace Emico\RobinHq\Queue;
 use Emico\RobinHqLib\Queue\FileQueue;
 use Emico\RobinHqLib\Queue\QueueInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\MessageQueue\ConnectionTypeResolver;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 
@@ -26,9 +27,10 @@ class QueueBridge implements QueueInterface
     private $directoryList;
 
     /**
-     * @var EventPublisherFactory
+     * @var AmqpPublisherFactory
      */
-    private $eventPublisherFactory;
+    private $amqpPublisherFactory;
+
     /**
      * @var ObjectManagerInterface
      */
@@ -38,18 +40,18 @@ class QueueBridge implements QueueInterface
      * QueueBridge constructor.
      * @param Manager $moduleManager
      * @param DirectoryList $directoryList
-     * @param EventPublisherFactory $eventPublisherFactory
+     * @param AmqpPublisherFactory $amqpPublisherFactory
      * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
         Manager $moduleManager,
         DirectoryList $directoryList,
-        EventPublisherFactory $eventPublisherFactory,
+        AmqpPublisherFactory $amqpPublisherFactory,
         ObjectManagerInterface $objectManager
     ) {
         $this->moduleManager = $moduleManager;
         $this->directoryList = $directoryList;
-        $this->eventPublisherFactory = $eventPublisherFactory;
+        $this->amqpPublisherFactory = $amqpPublisherFactory;
         $this->objectManager = $objectManager;
     }
 
@@ -65,6 +67,7 @@ class QueueBridge implements QueueInterface
      * @return QueueInterface
      *
      * Dynamically return right Queue implementation depending on Magento version
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function getQueueImplementation(): QueueInterface
     {
@@ -72,17 +75,38 @@ class QueueBridge implements QueueInterface
             return $this->queue;
         }
 
+        if ($this->isAmqpMessageQueueAvailable()) {
+            $this->queue = $this->amqpPublisherFactory->create();
+            return $this->queue;
+        }
+
+        // Fallback to file queue when requirements for AMQP queueing are not matched
+        $this->queue = $this->objectManager->create(
+            FileQueue::class,
+            [
+                'directory' => $this->directoryList->getPath(DirectoryList::VAR_DIR) . '/queue'
+            ]
+        );
+        return $this->queue;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isAmqpMessageQueueAvailable(): bool
+    {
         if ($this->moduleManager->isEnabled('Magento_MessageQueue') &&
             interface_exists('Magento\Framework\MessageQueue\PublisherInterface')) {
-            $this->queue = $this->eventPublisherFactory->create();
-        } else {
-            $this->queue = $this->objectManager->create(
-                FileQueue::class,
-                [
-                    'directory' => $this->directoryList->getPath(DirectoryList::VAR_DIR) . '/queue'
-                ]
-            );
+
+            /** @var ConnectionTypeResolver $connectionTypeResolver */
+            $connectionTypeResolver = $this->objectManager->get(ConnectionTypeResolver::class);
+            try {
+                $connectionTypeResolver->getConnectionType('amqp');
+                return true;
+            } catch (\LogicException $exception) {
+                return false;
+            }
         }
-        return $this->queue;
+        return false;
     }
 }

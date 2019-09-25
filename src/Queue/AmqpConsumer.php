@@ -5,7 +5,7 @@ namespace Emico\RobinHq\Queue;
 use Emico\RobinHqLib\Service\EventProcessingService;
 use Psr\Log\LoggerInterface;
 
-class EventConsumer
+class AmqpConsumer
 {
     /**
      * @var LoggerInterface

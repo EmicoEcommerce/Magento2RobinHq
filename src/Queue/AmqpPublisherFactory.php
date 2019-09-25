@@ -5,7 +5,7 @@ namespace Emico\RobinHq\Queue;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\MessageQueue\PublisherInterface;
 
-class EventPublisherFactory
+class AmqpPublisherFactory
 {
     /**
      * @var ObjectManagerInterface
@@ -23,6 +23,9 @@ class EventPublisherFactory
      */
     public function create(array $params = [])
     {
-        return $this->objectManager->create(PublisherInterface::class, $params);
+        /** @var AmqpPublisher $publisher */
+        $publisher = $this->objectManager->create(AmqpPublisher::class, $params);
+        $publisher->setPublisher($this->objectManager->get(PublisherInterface::class));
+        return $publisher;
     }
 }
