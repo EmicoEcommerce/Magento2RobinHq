@@ -3,7 +3,6 @@
 namespace Emico\RobinHq\Queue;
 
 use Emico\RobinHqLib\Queue\QueueInterface;
-use Magento\Framework\MessageQueue\PublisherInterface;
 
 class EventPublisher implements QueueInterface
 {
@@ -21,8 +20,11 @@ class EventPublisher implements QueueInterface
      * ItemPublisher constructor.
      * @param PublisherInterface $publisher
      */
-    public function __construct(PublisherInterface $publisher)
+    public function __construct()
     {
+        if (!interface_exists('\Magento\Framework\MessageQueue\PublisherInterface')) {
+            throw new \Exception();
+        }
         $this->publisher = $publisher;
     }
 
