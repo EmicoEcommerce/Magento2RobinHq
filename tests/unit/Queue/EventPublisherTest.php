@@ -3,14 +3,14 @@
 namespace Emico\RobinHqTest\Queue;
 
 use Codeception\Test\Unit;
-use Emico\RobinHq\Queue\EventPublisher;
+use Emico\RobinHq\Queue\AmqpPublisher;
 use Magento\Framework\MessageQueue\PublisherInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Mockery;
 use Mockery\MockInterface;
 use UnitTester;
 
-class EventPublisherTest extends Unit
+class AmqpPublisherTest extends Unit
 {
     /**
      * @var UnitTester
@@ -18,7 +18,7 @@ class EventPublisherTest extends Unit
     protected $tester;
 
     /**
-     * @var EventPublisher
+     * @var AmqpPublisher
      */
     private $eventPublisher;
 
@@ -33,7 +33,7 @@ class EventPublisherTest extends Unit
 
         $this->publisher = Mockery::spy(PublisherInterface::class);
 
-        $this->eventPublisher = $objectManager->getObject(EventPublisher::class, [
+        $this->eventPublisher = $objectManager->getObject(AmqpPublisher::class, [
             'publisher' => $this->publisher
         ]);
     }

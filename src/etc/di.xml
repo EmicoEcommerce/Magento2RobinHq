@@ -137,12 +137,6 @@
         </arguments>
     </virtualType>
 
-    <type name="Emico\RobinHqLib\Service\CustomerService">
-        <arguments>
-            <argument name="queue" xsi:type="object">Emico\RobinHq\Queue\EventPublisher</argument>
-        </arguments>
-    </type>
-
     <type name="Emico\RobinHqLib\Service\EventProcessingService">
         <arguments>
             <argument name="eventProcessors" xsi:type="array">
@@ -159,5 +153,5 @@
         </arguments>
     </type>
 
-    <preference for="Emico\RobinHqLib\Queue\QueueInterface" type="Emico\RobinHq\Queue\EventPublisher" />
+    <preference for="Emico\RobinHqLib\Queue\QueueInterface" type="Emico\RobinHq\Queue\QueueBridge" />
 </config>

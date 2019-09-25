@@ -4,14 +4,18 @@
     "require": {
         "php": "^7.1.0",
         "emico/robinhq-lib": "^1.0",
-        "magento/module-customer": "102.*",
-        "magento/module-catalog": "103.*",
-        "magento/module-message-queue": "100.*",
-        "magento/framework-message-queue": "100.*",
-        "magento/framework": "102.0.*",
+        "magento/module-customer": "101.*|102.*",
+        "magento/module-catalog": "102.*|103.*",
+        "magento/module-sales": "101.*|102.*",
+        "magento/module-config": "101.*",
+        "magento/framework": "101.*|102.*",
         "zendframework/zend-diactoros": "^1.8",
         "webmozart/assert": "^1.4",
         "ext-json": "*"
+    },
+    "suggest": {
+        "magento/module-message-queue": "Use Magento AMQP queuing for POST requests. Highly recommended",
+        "magento/framework-message-queue": "Use Magento AMQP queuing for POST requests. Highly recommended"
     },
     "type": "magento2-module",
     "autoload": {

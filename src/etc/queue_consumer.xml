@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
-    <consumer name="EmicoRobinHq" queue="emico.robinhq" connection="amqp" handler="Emico\RobinHq\Queue\EventConsumer::processMessage"/>
+    <consumer name="EmicoRobinHq" queue="emico.robinhq" connection="amqp" handler="Emico\RobinHq\Queue\AmqpConsumer::processMessage"/>
 </config>
