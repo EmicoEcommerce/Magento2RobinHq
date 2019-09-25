@@ -22,9 +22,10 @@ class FileQueueConsumer
     }
 
     /**
-     * Cron job method to clean old cache resources
+     * Process the RobinHQ file queue
      *
      * @return void
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function execute()
     {
