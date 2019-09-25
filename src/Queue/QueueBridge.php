@@ -66,7 +66,7 @@ class QueueBridge implements QueueInterface
      *
      * Dynamically return right Queue implementation depending on Magento version
      */
-    protected function getQueueImplementation(): QueueInterface
+    public function getQueueImplementation(): QueueInterface
     {
         if ($this->queue) {
             return $this->queue;
