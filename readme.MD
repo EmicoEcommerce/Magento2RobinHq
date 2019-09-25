@@ -5,6 +5,10 @@
 Provides API integrations with the RobinHQ platform / dashboards
 
 ## Installation
+Prerequisites
+ - Magento 2.2.0 or higer
+ - PHP 7.1 or higer
+
 Install package using composer
 ```sh
 composer require emico/magento-2-robinhq
