@@ -36,6 +36,8 @@ class AmqpPublisherTest extends Unit
         $this->eventPublisher = $objectManager->getObject(AmqpPublisher::class, [
             'publisher' => $this->publisher
         ]);
+
+        $this->eventPublisher->setPublisher($this->publisher);
     }
 
     public function testEventIsPublishedToInternalPublisher(): void

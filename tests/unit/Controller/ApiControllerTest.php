@@ -53,10 +53,12 @@ class ApiControllerTest extends Unit
 
         /** @var AbstractApi $controller */
         $controller = $objectManager->getObject($actionClass, [
-            'context' => $actionContextMock
+            'context' => $actionContextMock,
+            'restApiServer' => $restApiServer
         ]);
 
         $controller->execute();
+        Mockery::close();
     }
 
     public function testExceptionIsThrownOnInvalidRequest()
