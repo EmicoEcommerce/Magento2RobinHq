@@ -1,5 +1,6 @@
 {
     "name": "emico/magento-2-robinhq",
+    "license": "OSL-3.0",
     "description": "Magento 2 module for RobinHQ integration. Provides API endpoints for RobinHQ dynamic API",
     "require": {
         "php": "^7.1.0",
