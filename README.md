@@ -25,11 +25,11 @@ This module provides 5 endpoints for the RobinHQ dynamic API integration.
 This endpoints are called directly from within the RobinHQ dashboard, providing the latest up to date information from Magento.
 
 The following endpoints are available:
- - /robinhq/api/customer?email=`mail`
- - /robinhq/api/order?orderNumber=`number`
- - /robinhq/api/customerOrders?email=`mail`
- - /robinhq/api/search?searchTerm=`search`
- - /robinhq/api/lifetime?email=`email`
+ - /robinhq/api/customer?email=`$EmailAddress`
+ - /robinhq/api/customerOrders?email=`$EmailAddress`
+ - /robinhq/api/order?orderNumber=`$Id`
+ - /robinhq/api/search?searchTerm=`$Expression`
+ - /robinhq/api/lifetime?email=`$Email`
    
 Those are accessible from the root of your magento domain. http://my.shop.nl/robinhq/api/customer
 
