@@ -55,7 +55,16 @@ class SearchDataProviderTest extends \Codeception\Test\Unit
     public function _before()
     {
         $this->orderRepositoryMock = Mockery::mock(OrderRepositoryInterface::class);
+        $this->orderRepositoryMock
+            ->shouldReceive('getList')
+            ->andReturn(Mockery::mock(OrderSearchResultInterface::class, ['getItems' => []]))
+            ->byDefault();
+
         $this->customerRepositoryMock = Mockery::mock(CustomerRepositoryInterface::class);
+        $this->customerRepositoryMock
+            ->shouldReceive('getList')
+            ->andReturn(Mockery::mock(CustomerSearchResultsInterface::class, ['getItems' => []]))
+            ->byDefault();
 
         $orderFactoryMock = Mockery::mock(
             OrderFactory::class,
@@ -156,6 +165,22 @@ class SearchDataProviderTest extends \Codeception\Test\Unit
         $this->dataProvider->fetchData($request);
     }
 
+    public function testCanSearchByLastNineNumbersOfTelephone()
+    {
+        $request = (new ServerRequest())->withQueryParams(['searchTerm' => '123456789']);
+
+        $this->dataProvider->fetchData($request);
+        $this->assertFilterApplied('billing_telephone', '%123456789');
+    }
+
+    public function testLastTelephoneWildcardFilterIsOnlyAppliedOnNineCharacters()
+    {
+        $request = (new ServerRequest())->withQueryParams(['searchTerm' => '1234567']);
+
+        $this->dataProvider->fetchData($request);
+        $this->assertFilterNotApplied('billing_telephone', '%1234567');
+    }
+
     /**
      * @param string $field
      * @param string $value
@@ -176,5 +201,26 @@ class SearchDataProviderTest extends \Codeception\Test\Unit
             return;
         }
         $this->fail(sprintf('Expecting filter to be applied (%s = %s)', $field, $value));
+    }
+
+    /**
+     * @param string $field
+     * @param string $value
+     * @param string $conditionType
+     */
+    protected function assertFilterNotApplied(string $field, string $value, string $conditionType = 'like')
+    {
+        foreach ($this->appliedFilters as $appliedFilter) {
+            if ($appliedFilter->getField() !== $field) {
+                continue;
+            }
+            if ($appliedFilter->getValue() !== $value) {
+                continue;
+            }
+            if ($appliedFilter->getConditionType() !== $conditionType) {
+                continue;
+            }
+            $this->fail(sprintf('Expecting filter to not be applied (%s = %s)', $field, $value));
+        }
     }
 }

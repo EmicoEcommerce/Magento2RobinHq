@@ -109,8 +109,17 @@ class SearchDataProvider implements DataProviderInterface
             ->setValue($searchTerm . '%')
             ->setConditionType('like');
 
+        $filters = [$emailFilter, $telephoneFilter];
+
+        if (is_numeric($searchTerm) && strlen($searchTerm) === 9) {
+            $filters[] = (new Filter())
+                ->setField('billing_telephone')
+                ->setValue('%' . $searchTerm)
+                ->setConditionType('like');
+        }
+
         $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilters([$emailFilter, $telephoneFilter])
+            ->addFilters($filters)
             ->setPageSize(10)
             ->create();
 
