@@ -11,6 +11,7 @@ use Emico\RobinHq\DataProvider\ListView\Order\ListViewProviderInterface;
 use Emico\RobinHq\Mapper\OrderFactory;
 use Emico\RobinHqLib\Model\Order\DetailsView;
 use Helper\Unit;
+use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
@@ -55,6 +56,11 @@ class OrderFactoryTest extends \Codeception\Test\Unit
      * @var StoreManagerInterface|Mockery\LegacyMockInterface|Mockery\MockInterface
      */
     private $storeManagerMock;
+
+    /**
+     * @var UrlInterface|Mockery\LegacyMockInterface|Mockery\MockInterface
+     */
+    private $backendUrlInterfaceMock;
 
     /**
      * @var UnitTester
@@ -104,6 +110,12 @@ class OrderFactoryTest extends \Codeception\Test\Unit
             ->andThrow(new NoSuchEntityException(__()))
             ->byDefault();
 
+        $this->backendUrlInterfaceMock = Mockery::mock(UrlInterface::class);
+        $this->backendUrlInterfaceMock
+            ->shouldReceive('getUrl')
+            ->andReturnNull()
+            ->byDefault();
+
         $this->orderFactory = $this->objectManager->getObject(
             OrderFactory::class,
             [
@@ -112,7 +124,8 @@ class OrderFactoryTest extends \Codeception\Test\Unit
                 'sortOrderBuilder' => $sortOrderBuilderMock,
                 'listViewProvider' => $this->listViewProviderMock,
                 'detailViewProvider' => $this->detailsViewProviderMock,
-                'storeManager' => $this->storeManagerMock
+                'storeManager' => $this->storeManagerMock,
+                'backendUrl' => $this->backendUrlInterfaceMock
             ]
         );
     }
@@ -198,5 +211,21 @@ class OrderFactoryTest extends \Codeception\Test\Unit
 
         // Assert
         $this->assertNull($robinOrder->getWebstoreUrl());
+    }
+
+    public function testCanExtraBackendUrl()
+    {
+        // Setup fixtures
+        $orderFixture = $this->tester->createOrderFixture();
+
+        $this->backendUrlInterfaceMock
+            ->shouldReceive('getUrl')
+            ->andReturn('http://magento.test/admin_8dcprb/sales/order/view/order_id/1/key/940b63448f2537e6ef98591d79d95dec09e80145b0093688c335fffa868ec5d9/');
+
+        // Map data
+        $robinOrder = $this->orderFactory->createRobinOrder($orderFixture);
+
+        // Assert
+        $this->assertEquals('http://magento.test/admin_8dcprb/sales/order/view/order_id/1/', $robinOrder->getUrl());
     }
 }

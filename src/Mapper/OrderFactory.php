@@ -5,6 +5,7 @@ namespace Emico\RobinHq\Mapper;
 use Emico\RobinHq\DataProvider\DetailView\DetailViewProviderInterface;
 use Emico\RobinHq\DataProvider\ListView\Order\ListViewProviderInterface;
 use Emico\RobinHqLib\Model\Order;
+use Magento\Backend\Model\UrlInterface as BackendUrlInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -58,13 +59,19 @@ class OrderFactory
     private $firstOrders = [];
 
     /**
+     * @var BackendUrlInterface
+     */
+    private $backendUrl;
+
+    /**
      * OrderFactory constructor.
-     * @param OrderRepositoryInterface $orderRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param SortOrderBuilder $sortOrderBuilder
+     * @param OrderRepositoryInterface    $orderRepository
+     * @param SearchCriteriaBuilder       $searchCriteriaBuilder
+     * @param SortOrderBuilder            $sortOrderBuilder
      * @param DetailViewProviderInterface $detailViewProvider
-     * @param ListViewProviderInterface $listViewProvider
-     * @param StoreManagerInterface $storeManager
+     * @param ListViewProviderInterface   $listViewProvider
+     * @param StoreManagerInterface       $storeManager
+     * @param BackendUrlInterface         $backendUrl
      */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -72,7 +79,8 @@ class OrderFactory
         SortOrderBuilder $sortOrderBuilder,
         DetailViewProviderInterface $detailViewProvider,
         ListViewProviderInterface $listViewProvider,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        BackendUrlInterface $backendUrl
     ) {
         $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
@@ -80,6 +88,7 @@ class OrderFactory
         $this->detailViewProvider = $detailViewProvider;
         $this->listViewProvider = $listViewProvider;
         $this->storeManager = $storeManager;
+        $this->backendUrl = $backendUrl;
     }
 
     /**
@@ -96,6 +105,8 @@ class OrderFactory
         $robinOrder->setName($this->getCustomerFullName($order));
         $robinOrder->setEmailAddress($order->getCustomerEmail());
         $robinOrder->setFirstOrder($this->isFirstOrder($order));
+        $robinOrder->setUrl($this->getOrderBackendUrl($order));
+
         $storeUrl = $this->getStoreUrl($order);
         if ($storeUrl) {
             $robinOrder->setWebstoreUrl($storeUrl);
@@ -172,5 +183,15 @@ class OrderFactory
             return null;
         }
         return $store->getBaseUrl(UrlInterface::URL_TYPE_WEB);
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @return string
+     */
+    private function getOrderBackendUrl(OrderInterface $order): string
+    {
+        $orderUrl = $this->backendUrl->getUrl('sales/order/view', ['order_id' => $order->getEntityId()]);
+        return preg_replace('/(.*\/)key\/.*/', '$1', $orderUrl);
     }
 }
