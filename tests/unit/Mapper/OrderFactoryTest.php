@@ -20,6 +20,8 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\ResourceModel\Order\Collection;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mockery;
@@ -36,11 +38,6 @@ class OrderFactoryTest extends \Codeception\Test\Unit
      * @var OrderFactory
      */
     private $orderFactory;
-
-    /**
-     * @var OrderRepositoryInterface|Mockery\MockInterface
-     */
-    private $orderSearchResultMock;
 
     /**
      * @var DetailViewProviderInterface|Mockery\MockInterface
@@ -69,27 +66,14 @@ class OrderFactoryTest extends \Codeception\Test\Unit
 
     public function _before()
     {
-        $this->orderSearchResultMock = Mockery::mock(OrderSearchResultInterface::class, [
-            'getItems' => [$this->tester->createOrderFixture()]
+        $orderCollection = Mockery::mock(Collection::class, [
+            'getFirstItem' => $this->tester->createOrderFixture()
         ]);
+        $orderCollection->shouldReceive('addFieldToFilter')->andReturnSelf();
+        $orderCollection->shouldReceive('addAttributeToSort')->andReturnSelf();
 
-        $orderRepositoryMock = Mockery::mock(OrderRepositoryInterface::class, [
-            'getList' => $this->orderSearchResultMock
-        ]);
-
-        $searchCriteriaBuilderMock = Mockery::mock(SearchCriteriaBuilder::class);
-        $searchCriteriaBuilderMock->allows([
-            'setPageSize' => $searchCriteriaBuilderMock,
-            'addFilter' => $searchCriteriaBuilderMock,
-            'addSortOrder' => $searchCriteriaBuilderMock,
-            'create' => Mockery::mock(SearchCriteria::class)
-        ]);
-
-        $sortOrderBuilderMock = Mockery::mock(SortOrderBuilder::class);
-        $sortOrderBuilderMock->allows([
-            'setField' => $sortOrderBuilderMock,
-            'setAscendingDirection' => $sortOrderBuilderMock,
-            'create' => Mockery::mock(SortOrder::class)
+        $orderCollectionFactoryMock = Mockery::mock(CollectionFactory::class, [
+            'create' => $orderCollection
         ]);
 
         $this->objectManager = new ObjectManager($this);
@@ -119,9 +103,7 @@ class OrderFactoryTest extends \Codeception\Test\Unit
         $this->orderFactory = $this->objectManager->getObject(
             OrderFactory::class,
             [
-                'orderRepository' => $orderRepositoryMock,
-                'searchCriteriaBuilder' => $searchCriteriaBuilderMock,
-                'sortOrderBuilder' => $sortOrderBuilderMock,
+                'orderCollectionFactory' => $orderCollectionFactoryMock,
                 'listViewProvider' => $this->listViewProviderMock,
                 'detailViewProvider' => $this->detailsViewProviderMock,
                 'storeManager' => $this->storeManagerMock,
