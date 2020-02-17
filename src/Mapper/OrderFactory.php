@@ -6,12 +6,10 @@ use Emico\RobinHq\DataProvider\DetailView\DetailViewProviderInterface;
 use Emico\RobinHq\DataProvider\ListView\Order\ListViewProviderInterface;
 use Emico\RobinHqLib\Model\Order;
 use Magento\Backend\Model\UrlInterface as BackendUrlInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -22,21 +20,6 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class OrderFactory
 {
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var SortOrderBuilder
-     */
-    private $sortOrderBuilder;
-
     /**
      * @var DetailViewProviderInterface
      */
@@ -64,31 +47,30 @@ class OrderFactory
     private $backendUrl;
 
     /**
+     * @var CollectionFactory
+     */
+    private $orderCollectionFactory;
+
+    /**
      * OrderFactory constructor.
-     * @param OrderRepositoryInterface    $orderRepository
-     * @param SearchCriteriaBuilder       $searchCriteriaBuilder
-     * @param SortOrderBuilder            $sortOrderBuilder
      * @param DetailViewProviderInterface $detailViewProvider
      * @param ListViewProviderInterface   $listViewProvider
      * @param StoreManagerInterface       $storeManager
      * @param BackendUrlInterface         $backendUrl
+     * @param CollectionFactory           $orderCollectionFactory
      */
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        SortOrderBuilder $sortOrderBuilder,
         DetailViewProviderInterface $detailViewProvider,
         ListViewProviderInterface $listViewProvider,
         StoreManagerInterface $storeManager,
-        BackendUrlInterface $backendUrl
+        BackendUrlInterface $backendUrl,
+        CollectionFactory $orderCollectionFactory
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->sortOrderBuilder = $sortOrderBuilder;
         $this->detailViewProvider = $detailViewProvider;
         $this->listViewProvider = $listViewProvider;
         $this->storeManager = $storeManager;
         $this->backendUrl = $backendUrl;
+        $this->orderCollectionFactory = $orderCollectionFactory;
     }
 
     /**
@@ -147,20 +129,15 @@ class OrderFactory
 
         $firstOrder = $this->firstOrders[$customerEmail] ?? null;
         if (!$firstOrder) {
-            $sortOrder = $this->sortOrderBuilder
-                ->setField(OrderInterface::ENTITY_ID)
-                ->setAscendingDirection()
-                ->create();
 
-            $searchCriteria = $this->searchCriteriaBuilder
-                ->addFilter(OrderInterface::CUSTOMER_EMAIL, $customerEmail)
-                ->addSortOrder($sortOrder)
-                ->setPageSize(1)
-                ->create();
+            $orderCollection = $this->orderCollectionFactory->create();
+            $orderCollection
+                ->addFieldToFilter(OrderInterface::CUSTOMER_EMAIL, $customerEmail)
+                ->addAttributeToSort(OrderInterface::ENTITY_ID);
 
-            $customerOrders = $this->orderRepository->getList($searchCriteria)->getItems();
             /** @var OrderInterface $firstOrder */
-            $firstOrder = current($customerOrders);
+            $firstOrder = $orderCollection->getFirstItem();
+
             $this->firstOrders[$customerEmail] = $firstOrder;
         }
 
