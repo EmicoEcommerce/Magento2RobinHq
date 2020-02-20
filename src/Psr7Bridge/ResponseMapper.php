@@ -18,7 +18,7 @@ class ResponseMapper
      */
     public function mapPsrToMagentoResponse(ResponseInterface $psrResponse, Response $magentoResponse): void
     {
-        $magentoResponse->setBody($psrResponse->getBody());
+        $magentoResponse->setBody((string) $psrResponse->getBody());
         $magentoResponse->setCustomStatusCode($psrResponse->getStatusCode());
         foreach ($psrResponse->getHeaders() as $name => $values) {
             foreach ($values as $value) {
