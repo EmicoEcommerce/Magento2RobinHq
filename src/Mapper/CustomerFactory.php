@@ -11,6 +11,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
 /**
  * @author Bram Gerritsen <bgerritsen@emico.nl>
@@ -19,14 +20,9 @@ use Magento\Sales\Model\Order;
 class CustomerFactory
 {
     /**
-     * @var OrderRepositoryInterface
+     * @var CollectionFactory
      */
-    private $orderRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
+    private $orderCollectionFactory;
 
     /**
      * @var PanelViewProviderInterface
@@ -40,19 +36,16 @@ class CustomerFactory
 
     /**
      * CustomerFactory constructor.
-     * @param OrderRepositoryInterface $orderRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param CollectionFactory $orderCollectionFactory
      * @param PanelViewProviderInterface $panelViewProvider
      * @param CustomerService $customerService
      */
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
+        CollectionFactory $orderCollectionFactory,
         PanelViewProviderInterface $panelViewProvider,
         CustomerService $customerService
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->orderCollectionFactory = $orderCollectionFactory;
         $this->panelViewProvider = $panelViewProvider;
         $this->customerService = $customerService;
     }
@@ -103,12 +96,12 @@ class CustomerFactory
      */
     protected function addOrderInformation(CustomerInterface $customer, Customer $robinCustomer): void
     {
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(OrderInterface::CUSTOMER_ID, $customer->getId())
-            ->addFilter(OrderInterface::STATE, [Order::STATE_COMPLETE, Order::STATE_PROCESSING], 'in')
-            ->create();
+        $orderCollection = $this->orderCollectionFactory->create();
+        $orderCollection
+            ->addFieldToFilter(OrderInterface::CUSTOMER_ID, $customer->getId())
+            ->addFieldToFilter(OrderInterface::STATE, ['in' => [Order::STATE_COMPLETE, Order::STATE_PROCESSING]]);
 
-        $customerOrders = $this->orderRepository->getList($searchCriteria)->getItems();
+        $customerOrders = $orderCollection->getItems();
         $orderCount = count($customerOrders);
         if ($orderCount === 0) {
             return;
