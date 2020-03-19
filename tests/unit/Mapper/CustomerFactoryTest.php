@@ -15,6 +15,8 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\ResourceModel\Order\Collection;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Mockery;
 use UnitTester;
 
@@ -31,9 +33,9 @@ class CustomerFactoryTest extends \Codeception\Test\Unit
     private $customerMapper;
 
     /**
-     * @var OrderRepositoryInterface|Mockery\MockInterface
+     * @var Mockery\MockInterface
      */
-    private $orderSearchResultMock;
+    private $orderCollectionMock;
 
     /**
      * @var PanelViewProviderInterface|Mockery\MockInterface
@@ -47,24 +49,16 @@ class CustomerFactoryTest extends \Codeception\Test\Unit
 
     public function _before()
     {
-        $this->orderSearchResultMock = Mockery::mock(OrderSearchResultInterface::class);
-        $this->orderSearchResultMock
+        $this->orderCollectionMock = Mockery::mock(Collection::class);
+        $this->orderCollectionMock
             ->shouldReceive('getItems')
             ->andReturn([])
             ->byDefault();
+        $this->orderCollectionMock->shouldReceive('addFieldToFilter')->andReturnSelf();
 
-        $orderRepositoryMock = Mockery::mock(OrderRepositoryInterface::class);
-        $orderRepositoryMock
-            ->shouldReceive('getList')
-            ->andReturn($this->orderSearchResultMock);
-
-        $searchCriteriaBuilderMock = Mockery::mock(SearchCriteriaBuilder::class)
-            ->shouldReceive('addFilter')
-            ->andReturnSelf()
-            ->getMock();
-        $searchCriteriaBuilderMock
-            ->shouldReceive('create')
-            ->andReturn(Mockery::mock(SearchCriteria::class));
+        $orderCollectionFactoryMock = Mockery::mock(CollectionFactory::class, [
+            'create' => $this->orderCollectionMock
+        ]);
 
         $this->panelViewProviderMock = Mockery::mock(PanelViewProviderInterface::class);
         $this->panelViewProviderMock
@@ -77,8 +71,7 @@ class CustomerFactoryTest extends \Codeception\Test\Unit
         $this->customerMapper = $this->objectManager->getObject(
             CustomerFactory::class,
             [
-                'orderRepository' => $orderRepositoryMock,
-                'searchCriteriaBuilder' => $searchCriteriaBuilderMock,
+                'orderCollectionFactory' => $orderCollectionFactoryMock,
                 'panelViewProvider' => $this->panelViewProviderMock,
                 'customerService' => $this->objectManager->getObject(CustomerService::class)
             ]
@@ -104,7 +97,7 @@ class CustomerFactoryTest extends \Codeception\Test\Unit
     {
         // Setup fixtures
         $customerFixture = $this->tester->createCustomerFixture();
-        $this->orderSearchResultMock
+        $this->orderCollectionMock
             ->shouldReceive('getItems')
             ->andReturn([$this->tester->createOrderFixture()]);
 
