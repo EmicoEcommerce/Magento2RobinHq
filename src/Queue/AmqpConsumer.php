@@ -2,7 +2,7 @@
 
 namespace Emico\RobinHq\Queue;
 
-use Emico\RobinHqLib\Service\EventProcessingService;
+use Emico\RobinHq\Factory\EventProcessingServiceFactory;
 use Psr\Log\LoggerInterface;
 
 class AmqpConsumer
@@ -13,20 +13,20 @@ class AmqpConsumer
     private $log;
 
     /**
-     * @var EventProcessingService
+     * @var EventProcessingServiceFactory
      */
-    private $eventProcessingService;
+    private $eventProcessingServiceFactory;
 
     /**
      * UpdateConsumer constructor.
      *
-     * @param EventProcessingService $eventProcessingService
+     * @param EventProcessingServiceFactory $eventProcessingServiceFactory
      * @param LoggerInterface $log
      */
-    public function __construct(EventProcessingService $eventProcessingService, LoggerInterface $log)
+    public function __construct(EventProcessingServiceFactory $eventProcessingServiceFactory, LoggerInterface $log)
     {
         $this->log = $log;
-        $this->eventProcessingService = $eventProcessingService;
+        $this->eventProcessingServiceFactory = $eventProcessingServiceFactory;
     }
 
     /**
@@ -34,7 +34,8 @@ class AmqpConsumer
      */
     public function processMessage(string $message): void
     {
+        $eventProcessingService = $this->eventProcessingServiceFactory->create();
         $this->log->debug(sprintf('Handle message (%s)', $message));
-        $this->eventProcessingService->processEvent($message);
+        $eventProcessingService->processEvent($message);
     }
 }

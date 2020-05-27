@@ -137,15 +137,6 @@
         </arguments>
     </virtualType>
 
-    <type name="Emico\RobinHqLib\Service\EventProcessingService">
-        <arguments>
-            <argument name="eventProcessors" xsi:type="array">
-                <item name="customer" xsi:type="object">Emico\RobinHqLib\EventProcessor\CustomerEventProcessor</item>
-                <item name="order" xsi:type="object">Emico\RobinHqLib\EventProcessor\OrderEventProcessor</item>
-            </argument>
-        </arguments>
-    </type>
-
     <type name="Emico\RobinHq\Observer\OrderSaveAfterObserver">
         <arguments>
             <argument name="customerFactory" xsi:type="object">Emico\RobinHq\Mapper\SimpleCustomerFactory</argument>
