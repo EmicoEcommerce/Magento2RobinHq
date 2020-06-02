@@ -3,6 +3,7 @@
 namespace Emico\RobinHqTest\Queue;
 
 use Codeception\Test\Unit;
+use Emico\RobinHq\Factory\EventProcessingServiceFactory;
 use Emico\RobinHq\Queue\AmqpConsumer;
 use Emico\RobinHqLib\Service\EventProcessingService;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
@@ -23,7 +24,7 @@ class AmqpConsumerTest extends Unit
     protected $eventProcessingServiceMock;
 
     /**
-     * @var EventConsumer
+     * @var AmqpConsumer
      */
     protected $eventConsumer;
 
@@ -33,8 +34,13 @@ class AmqpConsumerTest extends Unit
 
         $this->eventProcessingServiceMock = Mockery::spy(EventProcessingService::class);
 
+        $eventProcessingServiceFactory = Mockery::mock(
+            EventProcessingServiceFactory::class,
+            ['create' => $this->eventProcessingServiceMock]
+        );
+
         $this->eventConsumer = $objectManager->getObject(AmqpConsumer::class, [
-            'eventProcessingService' => $this->eventProcessingServiceMock
+            'eventProcessingServiceFactory' => $eventProcessingServiceFactory
         ]);
     }
 
