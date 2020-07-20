@@ -36,18 +36,27 @@ class AttributeRetriever
     {
         try {
             $attributeConfig = $this->eavConfig->getAttribute($entityType, $attributeCode);
+
+            $label = $attributeConfig->getDefaultFrontendLabel();
+
+            if ($attributeConfig->usesSource() &&
+                method_exists($model, 'getAttributeText')) {
+                $value = $model->getAttributeText($attributeCode);
+            } else {
+                $value = $model->getData($attributeCode);
+            }
+
+            if ($value === false) {
+                return null;
+            } else  if (is_array($value)) {
+                $value = array_filter($value, function($item) { return is_scalar($item); });
+                $value = implode(',', $value);
+            } else {
+                $value = (string) $value;
+            }
         } catch (LocalizedException $e) {
             return null;
         }
-
-        $label = $attributeConfig->getDefaultFrontendLabel();
-
-        if (method_exists($model, 'getAttributeText')) {
-            $value = $model->getAttributeText($attributeCode);
-        } else {
-            $value = $model->getData($attributeCode);
-        }
-
         return new AttributeValue($label, $value);
     }
 }
