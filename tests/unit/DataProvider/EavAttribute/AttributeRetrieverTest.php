@@ -33,7 +33,10 @@ class AttributeRetrieverTest extends Unit
     {
         $attributeMock = Mockery::mock(
             AttributeInterface::class,
-            ['getDefaultFrontendLabel' => 'frontend label']
+            [
+                'getDefaultFrontendLabel' => 'frontend label',
+                'usesSource' => false
+            ]
         );
 
         $this->eavConfigMock = Mockery::mock(Config::class);
@@ -57,7 +60,7 @@ class AttributeRetrieverTest extends Unit
         $value = $this->attributeRetriever->getAttributeValue(Product::ENTITY, $model, 'code');
 
         $this->assertEquals('frontend label', $value->getLabel());
-        $this->assertEquals('attribute value', $value->getValue());
+        $this->assertEquals('attribute value2', $value->getValue());
     }
 
     public function testGetAttributeValueUsesGetData(): void
