@@ -46,7 +46,7 @@ class AttributeRetriever
                 $value = $model->getData($attributeCode);
             }
 
-            if ($value === false) {
+            if ($value === false || $value === null) {
                 return null;
             } else  if (is_array($value)) {
                 $value = array_filter($value, function($item) { return is_scalar($item); });
