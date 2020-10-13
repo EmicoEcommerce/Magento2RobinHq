@@ -5,11 +5,11 @@
     "require": {
         "php": "^7.1.0",
         "emico/robinhq-lib": "^1.0.6",
-        "magento/module-customer": "101.*|102.*",
-        "magento/module-catalog": "102.*|103.*",
-        "magento/module-sales": "101.*|102.*",
+        "magento/module-customer": "101.*|102.*|103.*",
+        "magento/module-catalog": "102.*|103.*|104.*",
+        "magento/module-sales": "101.*|102.*|103.*",
         "magento/module-config": "101.*",
-        "magento/framework": "101.*|102.*",
+        "magento/framework": "101.*|102.*|103.*",
         "zendframework/zend-diactoros": "^1.8",
         "webmozart/assert": "^1.4",
         "ext-json": "*"
