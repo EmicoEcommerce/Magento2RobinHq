@@ -5,6 +5,7 @@ php:
   - '7.4'
 
 before_script:
+  - composer --1
   - composer config -a -g http-basic.repo.magento.com $MAGENTO_USERNAME $MAGENTO_PASSWORD
   - composer install --no-plugins
 
