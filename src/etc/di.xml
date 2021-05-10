@@ -131,12 +131,6 @@
         </arguments>
     </virtualType>
 
-    <virtualType name="Emico\RobinHq\Model\Config\Source\OrderAttributes" type="Emico\RobinHq\Model\Config\Source\Attributes">
-        <arguments>
-            <argument name="entityType" xsi:type="string">order</argument>
-        </arguments>
-    </virtualType>
-
     <type name="Emico\RobinHq\Observer\OrderSaveAfterObserver">
         <arguments>
             <argument name="customerFactory" xsi:type="object">Emico\RobinHq\Mapper\SimpleCustomerFactory</argument>
