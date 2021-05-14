@@ -65,6 +65,7 @@
                 <item name="shipping_address" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\ShippingAddressDetailViewProvider</item>
                 <item name="products" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\ProductDetailViewProvider</item>
                 <item name="totals" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\TotalDetailViewProvider</item>
+                <item name="track_trace" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\TrackTraceProvider</item>
             </argument>
         </arguments>
     </virtualType>
@@ -85,8 +86,15 @@
     <!-- List view provider -->
     <preference for="Emico\RobinHq\DataProvider\ListView\Order\ListViewProviderInterface" type="Emico\RobinHq\DataProvider\ListView\Order\NullProvider" />
 
-    <virtualType name="Emico\RobinHq\DataProvider\ListView\Order\CustomerOrdersListViewProvider" type="Emico\RobinHq\DataProvider\ListView\Order\BaseDataProvider" />
-
+    <virtualType name="Emico\RobinHq\DataProvider\ListView\Order\CustomerOrdersListViewProvider" type="Emico\RobinHq\DataProvider\ListView\Order\AggregateProvider">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="base" xsi:type="object">Emico\RobinHq\DataProvider\ListView\Order\BaseDataProvider</item>
+                <item name="track_trace" xsi:type="object">Emico\RobinHq\DataProvider\ListView\Order\TrackTraceProvider</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    
     <!-- API endpoints -->
     <type name="Emico\RobinHq\Controller\Api\Customer">
         <arguments>
