@@ -53,6 +53,10 @@ class OrderAttributes extends Attributes implements OptionSourceInterface
             $this->orderResource->getMainTable()
         );
         foreach ($queryResult->fetchAll() as $columnDef) {
+            $columnDef = array_combine(
+                array_map('strtolower', array_keys($columnDef)),
+                array_values($columnDef)
+            );
             if (in_array($columnDef['column_name'], $attributeCodes, true)) {
                 continue;
             }
