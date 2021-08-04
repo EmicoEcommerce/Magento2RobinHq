@@ -1,13 +1,16 @@
 <?php
 /**
  * @author Bram Gerritsen <bgerritsen@emico.nl>
- * @copyright (c) Emico B.V. 2017
+ * @author Pieter Zandbergen <p.zandbergen@emico.nl>
+ * @copyright (c) Emico B.V. 2017-2021
  */
 
 namespace Emico\RobinHq\DataProvider\EavAttribute;
 
+use Emico\RobinHq\Model\Config\Source\OrderAttributes;
+use Exception;
 use Magento\Eav\Model\Config;
-use Magento\Framework\Exception\LocalizedException;
+use Magento\Eav\Model\Entity\Attribute\AbstractAttribute;
 use Magento\Framework\Model\AbstractExtensibleModel;
 
 class AttributeRetriever
@@ -18,26 +21,63 @@ class AttributeRetriever
     private $eavConfig;
 
     /**
-     * AttributeRetriever constructor.
-     * @param Config $eavConfig
+     * @var OrderAttributes
      */
-    public function __construct(Config $eavConfig)
+    private $orderAttributes;
+
+    /**
+     * AttributeRetriever constructor.
+     *
+     * @param Config          $eavConfig
+     * @param OrderAttributes $orderAttributes
+     */
+    public function __construct(Config $eavConfig, OrderAttributes $orderAttributes)
     {
         $this->eavConfig = $eavConfig;
+        $this->orderAttributes = $orderAttributes;
+    }
+
+    /**
+     * Get attribute label.
+     *
+     * @param AbstractAttribute $attribute
+     * @return string
+     * @throws Exception
+     */
+    private function getLabel(AbstractAttribute $attribute): string
+    {
+        // Prefer frontend label
+        if (($label = $attribute->getDefaultFrontendLabel()) !== null) {
+            return $label;
+        }
+
+        // For Order attributes, try the column comment
+        $attributeCode = $attribute->getAttributeCode();
+        if ($attribute->getEntityType()->getEntityTypeCode() === 'order') {
+            if (!empty($this->orderAttributes->getColumns()[$attributeCode])) {
+                return $this->orderAttributes->getColumns()[$attributeCode];
+            }
+        }
+
+        // Use attribute code as a last resort
+        return $attributeCode;
     }
 
     /**
      * @param string $entityType
      * @param AbstractExtensibleModel $model
      * @param string $attributeCode
-     * @return mixed
+     * @return AttributeValue|null
      */
-    public function getAttributeValue(string $entityType, AbstractExtensibleModel $model, string $attributeCode): ?AttributeValue
-    {
+    public function getAttributeValue(
+        string $entityType,
+        AbstractExtensibleModel $model,
+        string $attributeCode
+    ): ?AttributeValue {
         try {
             $attributeConfig = $this->eavConfig->getAttribute($entityType, $attributeCode);
 
-            $label = $attributeConfig->getDefaultFrontendLabel();
+            $label = $this->getLabel($attributeConfig);
 
             if ($attributeConfig->usesSource() &&
                 method_exists($model, 'getAttributeText')) {
@@ -54,7 +94,7 @@ class AttributeRetriever
             } else {
                 $value = (string) $value;
             }
-        } catch (LocalizedException $e) {
+        } catch (Exception $e) {
             return null;
         }
         return new AttributeValue($label, $value);
