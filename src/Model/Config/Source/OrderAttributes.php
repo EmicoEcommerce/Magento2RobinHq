@@ -21,6 +21,11 @@ class OrderAttributes extends Attributes implements OptionSourceInterface
     private $orderResource;
 
     /**
+     * @var array|null
+     */
+    private $columns;
+
+    /**
      * OrderAttributes constructor.
      *
      * @param Config        $eavConfig
@@ -30,6 +35,34 @@ class OrderAttributes extends Attributes implements OptionSourceInterface
     {
         $this->orderResource = $orderResource;
         parent::__construct($eavConfig, Order::ENTITY);
+    }
+
+    /**
+     * Get columns, key is column name and value is column comment.
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function getColumns(): array
+    {
+        if ($this->columns !== null) {
+            return $this->columns;
+        }
+        $this->columns = [];
+        $connection = $this->orderResource->getConnection();
+        $select = $connection->select()
+            ->from('information_schema.columns', [
+                'column_name',
+                'column_comment',
+            ])
+            ->where('table_schema = DATABASE()')
+            ->where('table_name = ?', $this->orderResource->getMainTable());
+        $queryResult = $connection->query($select);
+        foreach ($queryResult->fetchAll() as $columnDef) {
+            $this->columns[$columnDef['column_name']] = $columnDef['column_comment'];
+        }
+
+        return $this->columns;
     }
 
     /**
@@ -44,31 +77,18 @@ class OrderAttributes extends Attributes implements OptionSourceInterface
         $result = parent::toOptionArray();
         $attributeCodes = [];
         foreach ($result as $option) {
-            $attributeCodes[] = $option['value'];
+            $attributeCodes[] = strtolower($option['value']);
         }
-        $connection = $this->orderResource->getConnection();
-        $select = $connection->select()
-            ->from('information_schema.columns', [
-                'column_name',
-                'column_comment',
-            ])
-            ->where('table_schema = DATABASE()')
-            ->where('table_name = ?', $this->orderResource->getMainTable());
-        $queryResult = $connection->query($select);
-        foreach ($queryResult->fetchAll() as $columnDef) {
-            $columnDef = array_combine(
-                array_map('strtolower', array_keys($columnDef)),
-                array_values($columnDef)
-            );
-            if (in_array($columnDef['column_name'], $attributeCodes, true)) {
+        foreach ($this->getColumns() as $columnName => $columnComment) {
+            if (in_array(strtolower($columnName), $attributeCodes, true)) {
                 continue;
             }
             $result[] = [
-                'value' => $columnDef['column_name'],
+                'value' => $columnName,
                 'label' => sprintf(
                     '%s [%s]',
-                    $columnDef['column_comment'],
-                    $columnDef['column_name']
+                    $columnComment,
+                    $columnName
                 ),
             ];
         }
