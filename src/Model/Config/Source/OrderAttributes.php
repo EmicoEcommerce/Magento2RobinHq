@@ -47,11 +47,14 @@ class OrderAttributes extends Attributes implements OptionSourceInterface
             $attributeCodes[] = $option['value'];
         }
         $connection = $this->orderResource->getConnection();
-        $queryResult = $connection->query(
-            'SELECT column_name, column_comment FROM information_schema.columns'
-                . ' WHERE table_schema = DATABASE() AND table_name = ?',
-            $this->orderResource->getMainTable()
-        );
+        $select = $connection->select()
+            ->from('information_schema.columns', [
+                'column_name',
+                'column_comment',
+            ])
+            ->where('table_schema = DATABASE()')
+            ->where('table_name = ?', $this->orderResource->getMainTable());
+        $queryResult = $connection->query($select);
         foreach ($queryResult->fetchAll() as $columnDef) {
             $columnDef = array_combine(
                 array_map('strtolower', array_keys($columnDef)),
