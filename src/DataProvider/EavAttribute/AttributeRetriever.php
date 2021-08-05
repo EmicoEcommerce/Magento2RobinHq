@@ -12,6 +12,7 @@ use Exception;
 use Magento\Eav\Model\Config;
 use Magento\Eav\Model\Entity\Attribute\AbstractAttribute;
 use Magento\Framework\Model\AbstractExtensibleModel;
+use Magento\Sales\Model\Order;
 
 class AttributeRetriever
 {
@@ -53,7 +54,7 @@ class AttributeRetriever
 
         // For Order attributes, try the column comment
         $attributeCode = $attribute->getAttributeCode();
-        if ($attribute->getEntityType()->getEntityTypeCode() === 'order') {
+        if ($attribute->getEntityType()->getEntityTypeCode() === Order::ENTITY) {
             if (!empty($this->orderAttributes->getColumns()[$attributeCode])) {
                 return $this->orderAttributes->getColumns()[$attributeCode];
             }
