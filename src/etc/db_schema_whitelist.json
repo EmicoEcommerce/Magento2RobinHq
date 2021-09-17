@@ -1,0 +1,7 @@
+{
+    "sales_order": {
+        "index": {
+            "SALES_ORDER_CUSTOMER_EMAIL": true
+        }
+    }
+}
