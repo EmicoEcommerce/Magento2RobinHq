@@ -59,6 +59,7 @@ class OrderAttributes extends Attributes implements OptionSourceInterface
             ->where('table_name = ?', $this->orderResource->getMainTable());
         $queryResult = $connection->query($select);
         foreach ($queryResult->fetchAll() as $columnDef) {
+            $columnDef = array_change_key_case($columnDef, CASE_LOWER);
             $this->columns[$columnDef['column_name']] = $columnDef['column_comment'];
         }
 
