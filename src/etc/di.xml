@@ -66,6 +66,7 @@
                 <item name="products" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\ProductDetailViewProvider</item>
                 <item name="totals" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\TotalDetailViewProvider</item>
                 <item name="track_trace" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\TrackTraceProvider</item>
+                <item name="returns" xsi:type="object">Emico\RobinHq\DataProvider\DetailView\ReturnsProvider</item>
             </argument>
         </arguments>
     </virtualType>
