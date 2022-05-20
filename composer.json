@@ -4,7 +4,7 @@
     "description": "Magento 2 module for RobinHQ integration. Provides API endpoints for RobinHQ dynamic API",
     "require": {
         "php": ">=7.4 <=8.1",
-        "emico/robinhq-lib": "^1.1.0",
+        "emico/robinhq-lib": "^2.0",
         "magento/module-customer": "101.*|102.*|103.*",
         "magento/module-catalog": "102.*|103.*|104.*",
         "magento/module-sales": "101.*|102.*|103.*",
