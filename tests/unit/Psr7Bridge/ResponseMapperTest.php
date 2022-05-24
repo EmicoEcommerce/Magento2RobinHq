@@ -5,7 +5,7 @@ namespace Emico\RobinHqTest\Psr7Bridge;
 use Codeception\Test\Unit;
 use Emico\RobinHq\Psr7Bridge\ResponseMapper;
 use UnitTester;
-use Zend\Diactoros\Response;
+use Laminas\Diactoros\Response;
 
 class ResponseMapperTest extends Unit
 {

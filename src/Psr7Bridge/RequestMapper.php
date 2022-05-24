@@ -9,8 +9,8 @@ namespace Emico\RobinHq\Psr7Bridge;
 use function GuzzleHttp\Psr7\stream_for;
 use Magento\Framework\HTTP\PhpEnvironment\Request as MagentoRequest;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Diactoros\ServerRequest as PsrRequest;
-use Zend\Diactoros\Uri;
+use Laminas\Diactoros\ServerRequest as PsrRequest;
+use Laminas\Diactoros\Uri;
 
 class RequestMapper
 {

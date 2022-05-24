@@ -14,7 +14,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Mockery;
 use Mockery\MockInterface;
 use UnitTester;
-use Zend\Diactoros\ServerRequest;
+use Laminas\Diactoros\ServerRequest;
 
 class CustomerDataProviderTest extends \Codeception\Test\Unit
 {

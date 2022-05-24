@@ -11,7 +11,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
 use Psr\Http\Message\ResponseInterface;
-use Zend\Diactoros\ServerRequestFactory;
+use Laminas\Diactoros\ServerRequestFactory;
 use Magento\Framework\App\Response\Http as ResponseHttp;
 
 abstract class AbstractApi extends Action
