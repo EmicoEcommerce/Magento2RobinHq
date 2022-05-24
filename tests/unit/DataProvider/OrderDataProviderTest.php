@@ -16,7 +16,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Mockery;
 use Mockery\MockInterface;
 use UnitTester;
-use Zend\Diactoros\ServerRequest;
+use Laminas\Diactoros\ServerRequest;
 
 class OrderDataProviderTest extends \Codeception\Test\Unit
 {
