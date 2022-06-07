@@ -104,17 +104,15 @@ class SearchDataProvider implements DataProviderInterface
             ->setValue($searchTerm . '%')
             ->setConditionType('like');
 
-        $telephoneFilter = (new Filter())
-            ->setField('billing_telephone')
-            ->setValue($searchTerm . '%')
-            ->setConditionType('like');
+        $filters = [$emailFilter];
 
-        $filters = [$emailFilter, $telephoneFilter];
+        $parsedPhoneNumber = $this->parsePhoneNumber($searchTerm);
 
-        if (is_numeric($searchTerm) && strlen($searchTerm) === 9) {
-            $filters[] = (new Filter())
+        // It seems to be a phone number, search as such
+        if ($parsedPhoneNumber !== false) {
+            $filters[] = $telephoneFilter = (new Filter())
                 ->setField('billing_telephone')
-                ->setValue('%' . $searchTerm)
+                ->setValue('%' . $parsedPhoneNumber)
                 ->setConditionType('like');
         }
 
@@ -168,5 +166,37 @@ class SearchDataProvider implements DataProviderInterface
         }
 
         return $customerCollection;
+    }
+
+    /**
+     * This method validates if the searchterm is a (Dutch) Phone number
+     * If the method complies to defined checks, it returns the last 9 digits.
+     * Otherwise, it returns False
+     * @param mixed $searchTerm
+     * @return integer|false
+     */
+    protected function parsePhoneNumber($searchTerm)
+    {
+        // only Dutch numbers are supported at the moment
+        if (preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
+            return (int) substr($searchTerm, -9);
+        }
+
+        if (preg_match('/^0031[0-9]{9}$/', $searchTerm) !== false) {
+            return (int) substr($searchTerm, -9);
+        }
+
+        if (preg_match('/^0[0-9]{9}$/', $searchTerm) !== false) {
+            return (int) substr($searchTerm, -9);
+        }
+
+        // it doesn't seem to be a Dutch number, is it numeric?
+        if (is_numeric($searchTerm) === true) {
+            // yes, so again return the last 9 digits
+            return (int) substr($searchTerm, -9);
+        }
+
+        // in all other cases it isn't a phone number for sure
+        return false;
     }
 }
