@@ -169,10 +169,10 @@ class SearchDataProvider implements DataProviderInterface
      * as a literal search. Otherwise it will do a like search if the searchterm is a
      * numeric value.
      *
-     * @param mixed $searchTerm
+     * @param string $searchTerm
      * @return Filter|null
      */
-    protected function createPhoneNumberSearchFilter($searchTerm): ?Filter
+    protected function createPhoneNumberSearchFilter(string $searchTerm): ?Filter
     {
         // Does it seem a Dutch PhoneNumber? When yes, return a literal search filter
         if ($this->seemsDutchNumber($searchTerm) === true) {
@@ -200,10 +200,10 @@ class SearchDataProvider implements DataProviderInterface
      * This method validates if the searchterm is a numeric value.
      * If so, it returns the last 9 digits. Otherwise, it returns False
      *
-     * @param mixed $searchTerm
+     * @param string $searchTerm
      * @return integer|false
      */
-    protected function parsePhoneNumber($searchTerm)
+    protected function parsePhoneNumber(string $searchTerm)
     {
         // it doesn't seem to be a Dutch number, is it numeric?
         if (is_numeric($searchTerm) === true) {
@@ -220,10 +220,10 @@ class SearchDataProvider implements DataProviderInterface
      * The first test is international format with + symbol. The second test is international format
      * and the third test is local format with preceding 0.
      *
-     * @param mixed $searchTerm
+     * @param string $searchTerm
      * @return boolean
      */
-    protected function seemsDutchNumber($searchTerm): bool
+    protected function seemsDutchNumber(string $searchTerm): bool
     {
         if ((bool) preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
             return true;
@@ -243,10 +243,10 @@ class SearchDataProvider implements DataProviderInterface
     /**
      * This method returns an array with formatted phone numbers
      *
-     * @param mixed $phoneNumber
+     * @param string $phoneNumber
      * @return string[]
      */
-    protected function createDutchPhoneNumbers($phoneNumber): array
+    protected function createDutchPhoneNumbers(string $phoneNumber): array
     {
         $phoneNumber = (int) substr($phoneNumber, -9);
         return [
