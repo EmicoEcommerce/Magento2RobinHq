@@ -179,7 +179,7 @@ class SearchDataProvider implements DataProviderInterface
             $dutchPhoneNumbers = $this->createDutchPhoneNumbers($searchTerm);
             return (new Filter())
                 ->setField('billing_telephone')
-                ->setValue(implode(', ', $dutchPhoneNumbers))
+                ->setValue(implode(',', $dutchPhoneNumbers))
                 ->setConditionType('in');
         }
 
@@ -225,15 +225,15 @@ class SearchDataProvider implements DataProviderInterface
      */
     protected function seemsDutchNumber($searchTerm): bool
     {
-        if (preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
+        if ((bool) preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
             return true;
         }
 
-        if (preg_match('/^0031[0-9]{9}$/', $searchTerm) !== false) {
+        if ((bool) preg_match('/^0031[0-9]{9}$/', $searchTerm) !== false) {
             return true;
         }
 
-        if (preg_match('/^0[0-9]{9}$/', $searchTerm) !== false) {
+        if ((bool) preg_match('/^0[0-9]{9}$/', $searchTerm) !== false) {
             return true;
         }
 
