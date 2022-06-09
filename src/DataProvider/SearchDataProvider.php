@@ -28,27 +28,27 @@ class SearchDataProvider implements DataProviderInterface
     /**
      * @var OrderRepositoryInterface
      */
-    private $orderRepository;
+    private OrderRepositoryInterface $orderRepository;
 
     /**
      * @var OrderFactory
      */
-    private $orderFactory;
+    private OrderFactory $orderFactory;
 
     /**
      * @var SearchCriteriaBuilder
      */
-    private $searchCriteriaBuilder;
+    private SearchCriteriaBuilder $searchCriteriaBuilder;
 
     /**
      * @var CustomerRepositoryInterface
      */
-    private $customerRepository;
+    private CustomerRepositoryInterface $customerRepository;
 
     /**
      * @var CustomerFactory
      */
-    private $customerFactory;
+    private CustomerFactory $customerFactory;
 
     /**
      * OrderDataProvider constructor.
@@ -75,7 +75,6 @@ class SearchDataProvider implements DataProviderInterface
     /**
      * @param ServerRequestInterface $request
      * @return JsonSerializable
-     * @throws DataNotFoundException
      * @throws LocalizedException
      */
     public function fetchData(ServerRequestInterface $request): JsonSerializable
@@ -106,14 +105,10 @@ class SearchDataProvider implements DataProviderInterface
 
         $filters = [$emailFilter];
 
-        $parsedPhoneNumber = $this->parsePhoneNumber($searchTerm);
-
-        // It seems to be a phone number, search as such
-        if ($parsedPhoneNumber !== false) {
-            $filters[] = $telephoneFilter = (new Filter())
-                ->setField('billing_telephone')
-                ->setValue('%' . $parsedPhoneNumber)
-                ->setConditionType('like');
+        // add Phone Number search if applicable
+        $phoneNumberSearchFilter = $this->createPhoneNumberSearchFilter($searchTerm);
+        if ($phoneNumberSearchFilter instanceof Filter) {
+            $filters[] = $phoneNumberSearchFilter;
         }
 
         $searchCriteria = $this->searchCriteriaBuilder
@@ -169,27 +164,47 @@ class SearchDataProvider implements DataProviderInterface
     }
 
     /**
-     * This method validates if the searchterm is a (Dutch) Phone number
-     * If the method complies to defined checks, it returns the last 9 digits.
-     * Otherwise, it returns False
+     * This method creates a Filter for phone numbers
+     * If it seems a Dutch Phone number, the term will be parsed in 3 forms and used
+     * as a literal search. Otherwise it will do a like search if the searchterm is a
+     * numeric value.
+     *
+     * @param mixed $searchTerm
+     * @return Filter|null
+     */
+    protected function createPhoneNumberSearchFilter($searchTerm): ?Filter
+    {
+        // Does it seem a Dutch PhoneNumber? When yes, return a literal search filter
+        if ($this->seemsDutchNumber($searchTerm) === true) {
+            $dutchPhoneNumbers = $this->createDutchPhoneNumbers($searchTerm);
+            return (new Filter())
+                ->setField('billing_telephone')
+                ->setValue(implode(', ', $dutchPhoneNumbers))
+                ->setConditionType('in');
+        }
+
+        // Is it a phone number at all?
+        $parsedPhoneNumber = $this->parsePhoneNumber($searchTerm);
+        if ($parsedPhoneNumber !== false) {
+            // It seems to be a phone number, search as such
+            return (new Filter())
+                ->setField('billing_telephone')
+                ->setValue('%' . $parsedPhoneNumber)
+                ->setConditionType('like');
+        }
+
+        return null;
+    }
+
+    /**
+     * This method validates if the searchterm is a numeric value.
+     * If so, it returns the last 9 digits. Otherwise, it returns False
+     *
      * @param mixed $searchTerm
      * @return integer|false
      */
     protected function parsePhoneNumber($searchTerm)
     {
-        // only Dutch numbers are supported at the moment
-        if (preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
-            return (int) substr($searchTerm, -9);
-        }
-
-        if (preg_match('/^0031[0-9]{9}$/', $searchTerm) !== false) {
-            return (int) substr($searchTerm, -9);
-        }
-
-        if (preg_match('/^0[0-9]{9}$/', $searchTerm) !== false) {
-            return (int) substr($searchTerm, -9);
-        }
-
         // it doesn't seem to be a Dutch number, is it numeric?
         if (is_numeric($searchTerm) === true) {
             // yes, so again return the last 9 digits
@@ -198,5 +213,46 @@ class SearchDataProvider implements DataProviderInterface
 
         // in all other cases it isn't a phone number for sure
         return false;
+    }
+
+    /**
+     * This method performs three tests to validate if the value seems to be a Dutch phone number
+     * The first test is international format with + symbol. The second test is international format
+     * and the third test is local format with preceding 0.
+     *
+     * @param mixed $searchTerm
+     * @return boolean
+     */
+    protected function seemsDutchNumber($searchTerm): bool
+    {
+        if (preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
+            return true;
+        }
+
+        if (preg_match('/^0031[0-9]{9}$/', $searchTerm) !== false) {
+            return true;
+        }
+
+        if (preg_match('/^0[0-9]{9}$/', $searchTerm) !== false) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * This method returns an array with formatted phone numbers
+     *
+     * @param mixed $phoneNumber
+     * @return string[]
+     */
+    protected function createDutchPhoneNumbers($phoneNumber): array
+    {
+        $phoneNumber = (int) substr($phoneNumber, -9);
+        return [
+            '+31' . $phoneNumber,
+            '0031' . $phoneNumber,
+            '0' . $phoneNumber
+        ];
     }
 }
