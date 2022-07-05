@@ -6,7 +6,7 @@
 
 namespace Emico\RobinHq\Psr7Bridge;
 
-use function GuzzleHttp\Psr7\stream_for;
+use GuzzleHttp\Psr7\Utils;
 use Magento\Framework\HTTP\PhpEnvironment\Request as MagentoRequest;
 use Psr\Http\Message\ServerRequestInterface;
 use Laminas\Diactoros\ServerRequest as PsrRequest;
@@ -23,7 +23,7 @@ class RequestMapper
         $psrRequest = (new PsrRequest($magentoRequest->getServer()->toArray()))
             ->withMethod($magentoRequest->getMethod())
             ->withUri(new Uri($magentoRequest->getUri()->__toString()))
-            ->withBody(stream_for($magentoRequest->getContent()))
+            ->withBody(Utils::streamFor($magentoRequest->getContent()))
             ->withQueryParams($magentoRequest->getQuery()->toArray());
 
         return $this->mapHeaders($magentoRequest, $psrRequest);
