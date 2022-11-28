@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Emico\RobinHq\Model;
 
@@ -12,13 +13,23 @@ use Magento\Store\Model\ScopeInterface;
  */
 class Config implements ConfigInterface
 {
+    private const PATH_API_KEY = 'robinhq/api/key';
+    private const PATH_API_SECRET = 'robinhq/api/secret';
+    private const PATH_API_URL = 'robinhq/api/url';
+    private const PATH_API_SERVER_KEY = 'robinhq/api/server_key';
+    private const PATH_API_SERVER_SECRET = 'robinhq/api/server_secret';
+    private const PATH_API_SERVER_ENABLED = 'robinhq/api/server_enabled';
+    private const PATH_API_POST_ENABLED = 'robinhq/api/post_enabled';
+    private const PATH_CUSTOM_ATTRIBUTES_CUSTOMER_ATTRIBUTES = 'robinhq/custom_attributes/customer_attributes';
+    private const PATH_CUSTOM_ATTRIBUTES_PRODUCT_ATTRIBUTES = 'robinhq/custom_attributes/product_attributes';
+    private const PATH_CUSTOM_ATTRIBUTES_ORDER_ATTRIBUTES = 'robinhq/custom_attributes/order_attributes';
+
     /**
      * @var ScopeConfigInterface
      */
     private $config;
 
     /**
-     * Config constructor.
      * @param ScopeConfigInterface $config
      */
     public function __construct(ScopeConfigInterface $config)
@@ -31,7 +42,7 @@ class Config implements ConfigInterface
      */
     public function getApiKey(): string
     {
-        return (string)$this->config->getValue('robinhq/api/key', ScopeInterface::SCOPE_STORE);
+        return (string)$this->config->getValue(self::PATH_API_KEY, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -39,7 +50,7 @@ class Config implements ConfigInterface
      */
     public function getApiSecret(): string
     {
-        return (string)$this->config->getValue('robinhq/api/secret', ScopeInterface::SCOPE_STORE);
+        return (string)$this->config->getValue(self::PATH_API_SECRET, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -47,7 +58,7 @@ class Config implements ConfigInterface
      */
     public function getApiUri(): string
     {
-        return (string)$this->config->getValue('robinhq/api/url', ScopeInterface::SCOPE_STORE);
+        return (string)$this->config->getValue(self::PATH_API_URL, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -55,7 +66,7 @@ class Config implements ConfigInterface
      */
     public function getApiServerKey(): string
     {
-        return (string)$this->config->getValue('robinhq/api/server_key', ScopeInterface::SCOPE_STORE);
+        return (string)$this->config->getValue(self::PATH_API_SERVER_KEY, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -63,7 +74,7 @@ class Config implements ConfigInterface
      */
     public function getApiServerSecret(): string
     {
-        return (string)$this->config->getValue('robinhq/api/server_secret', ScopeInterface::SCOPE_STORE);
+        return (string)$this->config->getValue(self::PATH_API_SERVER_SECRET, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -71,7 +82,7 @@ class Config implements ConfigInterface
      */
     public function isApiEnabled(): bool
     {
-        return (bool)$this->config->getValue('robinhq/api/server_enabled', ScopeInterface::SCOPE_STORE);
+        return $this->config->isSetFlag(self::PATH_API_SERVER_ENABLED, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -79,7 +90,7 @@ class Config implements ConfigInterface
      */
     public function isPostApiEnabled(): bool
     {
-        return (bool)$this->config->getValue('robinhq/api/post_enabled', ScopeInterface::SCOPE_STORE);
+        return $this->config->isSetFlag(self::PATH_API_POST_ENABLED, ScopeInterface::SCOPE_STORE);
     }
 
     /**
@@ -87,14 +98,7 @@ class Config implements ConfigInterface
      */
     public function getCustomerAttributes(): array
     {
-        return array_filter(
-            explode(
-                ',',
-                $this->config->getValue('robinhq/custom_attributes/customer_attributes',
-                    ScopeInterface::SCOPE_STORE
-                )
-            )
-        );
+        return $this->getAttributesList(self::PATH_CUSTOM_ATTRIBUTES_CUSTOMER_ATTRIBUTES);
     }
 
     /**
@@ -102,14 +106,7 @@ class Config implements ConfigInterface
      */
     public function getProductAttributes(): array
     {
-        return array_filter(
-            explode(
-                ',',
-                $this->config->getValue('robinhq/custom_attributes/product_attributes',
-                    ScopeInterface::SCOPE_STORE
-                )
-            )
-        );
+        return $this->getAttributesList(self::PATH_CUSTOM_ATTRIBUTES_PRODUCT_ATTRIBUTES);
     }
 
     /**
@@ -117,13 +114,22 @@ class Config implements ConfigInterface
      */
     public function getOrderAttributes(): array
     {
-        return array_filter(
-            explode(
-                ',',
-                $this->config->getValue('robinhq/custom_attributes/order_attributes',
-                    ScopeInterface::SCOPE_STORE
-                )
-            )
-        );
+        return $this->getAttributesList(self::PATH_CUSTOM_ATTRIBUTES_ORDER_ATTRIBUTES);
+    }
+
+    /**
+     * @return array
+     */
+    private function getAttributesList(string $path): array
+    {
+        $result = [];
+        $attributesString = $this->config->getValue($path, ScopeInterface::SCOPE_STORE);
+
+        if (null !== $attributesString) {
+            $attributes = explode(',', $attributesString);
+            $result = array_filter($attributes);
+        }
+
+        return $result;
     }
 }
