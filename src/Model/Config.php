@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Emico\RobinHq\Model;
 
@@ -7,11 +8,22 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 
 /**
- * @author Bram Gerritsen <bgerritsen@emico.nl>
+ * @author        Bram Gerritsen <bgerritsen@emico.nl>
  * @copyright (c) Emico B.V. 2017
  */
 class Config implements ConfigInterface
 {
+    public const XML_PATH_API_KEY = 'robinhq/api/key';
+    public const XML_PATH_API_SECRET = 'robinhq/api/secret';
+    public const XML_PATH_API_URL = 'robinhq/api/url';
+    public const XML_PATH_API_SERVER_KEY = 'robinhq/api/server_key';
+    public const XML_PATH_API_SERVER_SECRET = 'robinhq/api/server_secret';
+    public const XML_PATH_API_SERVER_ENABLED = 'robinhq/api/server_enabled';
+    public const XML_PATH_API_POST_ENABLED = 'robinhq/api/post_enabled';
+    public const XML_PATH_CUSTOM_ATTRIBUTES_CUSTOMER_ATTRIBUTES = 'robinhq/custom_attributes/customer_attributes';
+    public const XML_PATH_CUSTOM_ATTRIBUTES_PRODUCT_ATTRIBUTES = 'robinhq/custom_attributes/product_attributes';
+    public const XML_PATH_CUSTOM_ATTRIBUTES_ORDER_ATTRIBUTES = 'robinhq/custom_attributes/order_attributes';
+
     /**
      * @var ScopeConfigInterface
      */
@@ -19,6 +31,7 @@ class Config implements ConfigInterface
 
     /**
      * Config constructor.
+     *
      * @param ScopeConfigInterface $config
      */
     public function __construct(ScopeConfigInterface $config)
@@ -27,11 +40,33 @@ class Config implements ConfigInterface
     }
 
     /**
+     * @param string $path
+     * @param string $scopeType
+     *
+     * @return int|string|null
+     */
+    protected function getConfigValue(string $path, string $scopeType = ScopeInterface::SCOPE_STORE)
+    {
+        return $this->config->getValue($path, $scopeType);
+    }
+
+    /**
+     * @param string $path
+     * @param string $scopeType
+     *
+     * @return bool
+     */
+    protected function isConfigFlagSet(string $path, string $scopeType = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->config->isSetFlag($path, $scopeType);
+    }
+
+    /**
      * @return string
      */
     public function getApiKey(): string
     {
-        return (string)$this->config->getValue('robinhq/api/key', ScopeInterface::SCOPE_STORE);
+        return (string)$this->getConfigValue(self::XML_PATH_API_KEY);
     }
 
     /**
@@ -39,7 +74,7 @@ class Config implements ConfigInterface
      */
     public function getApiSecret(): string
     {
-        return (string)$this->config->getValue('robinhq/api/secret', ScopeInterface::SCOPE_STORE);
+        return (string)$this->getConfigValue(self::XML_PATH_API_SECRET);
     }
 
     /**
@@ -47,7 +82,7 @@ class Config implements ConfigInterface
      */
     public function getApiUri(): string
     {
-        return (string)$this->config->getValue('robinhq/api/url', ScopeInterface::SCOPE_STORE);
+        return (string)$this->getConfigValue(self::XML_PATH_API_URL);
     }
 
     /**
@@ -55,7 +90,7 @@ class Config implements ConfigInterface
      */
     public function getApiServerKey(): string
     {
-        return (string)$this->config->getValue('robinhq/api/server_key', ScopeInterface::SCOPE_STORE);
+        return (string)$this->getConfigValue(self::XML_PATH_API_SERVER_KEY);
     }
 
     /**
@@ -63,7 +98,7 @@ class Config implements ConfigInterface
      */
     public function getApiServerSecret(): string
     {
-        return (string)$this->config->getValue('robinhq/api/server_secret', ScopeInterface::SCOPE_STORE);
+        return (string)$this->getConfigValue(self::XML_PATH_API_SERVER_SECRET);
     }
 
     /**
@@ -71,7 +106,7 @@ class Config implements ConfigInterface
      */
     public function isApiEnabled(): bool
     {
-        return (bool)$this->config->getValue('robinhq/api/server_enabled', ScopeInterface::SCOPE_STORE);
+        return $this->isConfigFlagSet(self::XML_PATH_API_SERVER_ENABLED);
     }
 
     /**
@@ -79,7 +114,22 @@ class Config implements ConfigInterface
      */
     public function isPostApiEnabled(): bool
     {
-        return (bool)$this->config->getValue('robinhq/api/post_enabled', ScopeInterface::SCOPE_STORE);
+        return $this->isConfigFlagSet(self::XML_PATH_API_POST_ENABLED);
+    }
+
+    /**
+     * @param string $configPath
+     *
+     * @return array
+     */
+    protected function getCustomAttributes(string $configPath): array
+    {
+        $value = $this->getConfigValue($configPath);
+        if (empty($value)) {
+            return [];
+        }
+
+        return array_filter(explode(',', $value));
     }
 
     /**
@@ -87,14 +137,7 @@ class Config implements ConfigInterface
      */
     public function getCustomerAttributes(): array
     {
-        return array_filter(
-            explode(
-                ',',
-                $this->config->getValue('robinhq/custom_attributes/customer_attributes',
-                    ScopeInterface::SCOPE_STORE
-                )
-            )
-        );
+        return $this->getCustomAttributes(self::XML_PATH_CUSTOM_ATTRIBUTES_CUSTOMER_ATTRIBUTES);
     }
 
     /**
@@ -102,14 +145,7 @@ class Config implements ConfigInterface
      */
     public function getProductAttributes(): array
     {
-        return array_filter(
-            explode(
-                ',',
-                $this->config->getValue('robinhq/custom_attributes/product_attributes',
-                    ScopeInterface::SCOPE_STORE
-                )
-            )
-        );
+        return $this->getCustomAttributes(self::XML_PATH_CUSTOM_ATTRIBUTES_PRODUCT_ATTRIBUTES);
     }
 
     /**
@@ -117,13 +153,6 @@ class Config implements ConfigInterface
      */
     public function getOrderAttributes(): array
     {
-        return array_filter(
-            explode(
-                ',',
-                $this->config->getValue('robinhq/custom_attributes/order_attributes',
-                    ScopeInterface::SCOPE_STORE
-                )
-            )
-        );
+        return $this->getCustomAttributes(self::XML_PATH_CUSTOM_ATTRIBUTES_ORDER_ATTRIBUTES);
     }
 }
