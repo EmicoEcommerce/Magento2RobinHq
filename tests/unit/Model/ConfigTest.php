@@ -27,19 +27,23 @@ class ConfigTest extends Unit
             'isApiEnabled' => ['isApiEnabled', 'robinhq/api/server_enabled', '1', true],
             'isPostApiEnabled' => ['isPostApiEnabled', 'robinhq/api/post_enabled', '1', true],
             'getCustomerAttributes' => ['getCustomerAttributes', 'robinhq/custom_attributes/customer_attributes', 'foo,bar', ['foo', 'bar']],
+            'getCustomerAttributesNull' => ['getCustomerAttributes', 'robinhq/custom_attributes/customer_attributes', null, []],
             'getProductAttributes' => ['getProductAttributes', 'robinhq/custom_attributes/product_attributes', 'foo,bar', ['foo', 'bar']],
+            'getProductAttributesNull' => ['getProductAttributes', 'robinhq/custom_attributes/product_attributes', null, []],
             'getOrderAttributes' => ['getOrderAttributes', 'robinhq/custom_attributes/order_attributes', 'foo,bar', ['foo', 'bar']],
+            'getOrderAttributesNull' => ['getOrderAttributes', 'robinhq/custom_attributes/order_attributes', null, []],
         ];
     }
 
     /**
-     * @param string $method
-     * @param string $expectedConfigPath
-     * @param string $configValue
-     * @param $expectedReturnValue
+     * @param string      $method
+     * @param string      $expectedConfigPath
+     * @param string|null $configValue
+     * @param             $expectedReturnValue
+     *
      * @dataProvider configMappingProvider
      */
-    public function testCorrectConfigPathsAreCalled(string $method, string $expectedConfigPath, string $configValue, $expectedReturnValue): void
+    public function testCorrectConfigPathsAreCalled(string $method, string $expectedConfigPath, ?string $configValue, $expectedReturnValue): void
     {
         $scopeConfigMock = Mockery::mock(ScopeConfigInterface::class);
         $scopeConfigMock
