@@ -96,10 +96,12 @@ class OrderSaveAfterObserver implements ObserverInterface
             return;
         }
 
-        /** @var Order $order */
         $order = $observer->getData('order');
         $statesToProcess = [Order::STATE_PROCESSING, Order::STATE_COMPLETE, Order::STATE_CLOSED];
-        if (!$order || !\in_array($order->getState(), $statesToProcess, true)) {
+        if (!($order instanceof OrderInterface)
+            || (string) $order->getIncrementId() === ''
+            || !\in_array($order->getState(), $statesToProcess, true)
+        ) {
             return;
         }
 
@@ -144,7 +146,7 @@ class OrderSaveAfterObserver implements ObserverInterface
         $robinOrder = $this->orderFactory->createRobinOrder($order);
 
         $this->logger->debug(sprintf('Publishing RobinHQ POST for order'), [
-            'orderId' => $order->getId(),
+            'orderId' => $order->getEntityId(),
         ]);
 
         $this->orderService->postOrder($robinOrder);
