@@ -10,7 +10,7 @@
         "magento/module-sales": "101.*|102.*|103.*",
         "magento/module-config": "101.*",
         "magento/framework": "101.*|102.*|103.*",
-        "laminas/laminas-diactoros": "^2.0",
+        "laminas/laminas-diactoros": "^3.2",
         "webmozart/assert": "^1.4",
         "ext-json": "*"
     },
