@@ -70,7 +70,7 @@ class ApiControllerTest extends Unit
         $actionContextMock = Mockery::mock(
             ActionContext::class,
             [
-                'getRequest' => Mockery::mock(\Zend\Http\Request::class),
+                'getRequest' => Mockery::mock(\Laminas\Http\Request::class),
             ]
         );
         $actionContextMock->makePartial();
