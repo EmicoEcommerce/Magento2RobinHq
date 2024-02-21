@@ -7,8 +7,8 @@ use Emico\RobinHq\Psr7Bridge\RequestMapper;
 use Magento\Framework\HTTP\PhpEnvironment\Request as MagentoRequest;
 use Mockery;
 use UnitTester;
-use Zend\Http\Headers;
-use Zend\Stdlib\Parameters;
+use Laminas\Http\Headers;
+use Laminas\Stdlib\Parameters;
 
 class RequestMapperTest extends Unit
 {
