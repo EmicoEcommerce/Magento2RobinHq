@@ -25,10 +25,10 @@ class LoggedInCustomer implements ArgumentInterface
     public function getName(): string
     {
         try {
-            return $this->customerSession->getCustomer()->getName();
+            return $this->customerSession->getCustomer()->getName() ?? 'Unknown';
         } catch (LocalizedException $e) {
             $this->logger->error('Could not get customer name', ['exception' => $e]);
-            return '';
+            return 'Unknown';
         }
     }
 
