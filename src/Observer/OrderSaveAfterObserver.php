@@ -90,7 +90,7 @@ class OrderSaveAfterObserver implements ObserverInterface
      * @return void
      * @throws \Exception
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         if (!$this->moduleConfig->isPostApiEnabled()) {
             return;

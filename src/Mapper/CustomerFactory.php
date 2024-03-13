@@ -20,34 +20,16 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 class CustomerFactory
 {
     /**
-     * @var CollectionFactory
-     */
-    private $orderCollectionFactory;
-
-    /**
-     * @var PanelViewProviderInterface
-     */
-    private $panelViewProvider;
-
-    /**
-     * @var CustomerService
-     */
-    private $customerService;
-
-    /**
      * CustomerFactory constructor.
      * @param CollectionFactory $orderCollectionFactory
      * @param PanelViewProviderInterface $panelViewProvider
      * @param CustomerService $customerService
      */
     public function __construct(
-        CollectionFactory $orderCollectionFactory,
-        PanelViewProviderInterface $panelViewProvider,
-        CustomerService $customerService
+        private CollectionFactory $orderCollectionFactory,
+        private PanelViewProviderInterface $panelViewProvider,
+        private CustomerService $customerService
     ) {
-        $this->orderCollectionFactory = $orderCollectionFactory;
-        $this->panelViewProvider = $panelViewProvider;
-        $this->customerService = $customerService;
     }
 
     /**

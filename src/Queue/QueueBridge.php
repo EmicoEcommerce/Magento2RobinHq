@@ -12,29 +12,9 @@ use Magento\Framework\ObjectManagerInterface;
 class QueueBridge implements QueueInterface
 {
     /**
-     * @var QueueInterface
+     * @var QueueInterface|null
      */
-    protected $queue;
-
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-
-    /**
-     * @var DirectoryList
-     */
-    private $directoryList;
-
-    /**
-     * @var AmqpPublisherFactory
-     */
-    private $amqpPublisherFactory;
-
-    /**
-     * @var ObjectManagerInterface
-     */
-    private $objectManager;
+    protected ?QueueInterface $queue = null;
 
     /**
      * QueueBridge constructor.
@@ -44,15 +24,11 @@ class QueueBridge implements QueueInterface
      * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
-        Manager $moduleManager,
-        DirectoryList $directoryList,
-        AmqpPublisherFactory $amqpPublisherFactory,
-        ObjectManagerInterface $objectManager
+        private Manager $moduleManager,
+        private DirectoryList $directoryList,
+        private AmqpPublisherFactory $amqpPublisherFactory,
+        private  ObjectManagerInterface $objectManager
     ) {
-        $this->moduleManager = $moduleManager;
-        $this->directoryList = $directoryList;
-        $this->amqpPublisherFactory = $amqpPublisherFactory;
-        $this->objectManager = $objectManager;
     }
 
     /**

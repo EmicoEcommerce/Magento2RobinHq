@@ -23,32 +23,16 @@ use Webmozart\Assert\Assert;
 class CustomerDataProvider implements DataProviderInterface
 {
     /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
-    /**
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-    /**
-     * @var CustomerFactory
-     */
-    private $customerFactory;
-
-    /**
      * CustomerDataProvider constructor.
      * @param CustomerRepositoryInterface $customerRepository
      * @param CustomerFactory             $customerFactory
      * @param StoreManagerInterface       $storeManager
      */
     public function __construct(
-        CustomerRepositoryInterface $customerRepository,
-        CustomerFactory $customerFactory,
-        StoreManagerInterface $storeManager
+        private CustomerRepositoryInterface $customerRepository,
+        private CustomerFactory $customerFactory,
+        private StoreManagerInterface $storeManager
     ) {
-        $this->customerRepository = $customerRepository;
-        $this->customerFactory = $customerFactory;
-        $this->storeManager = $storeManager;
     }
 
     /**

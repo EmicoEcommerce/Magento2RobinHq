@@ -14,7 +14,7 @@ class AggregateProvider implements PanelViewProviderInterface
     /**
      * @var array|CustomerPanelViewProviderInterface[]
      */
-    private $providers;
+    private array $providers;
 
     /**
      * AggregateDetailViewProvider constructor.

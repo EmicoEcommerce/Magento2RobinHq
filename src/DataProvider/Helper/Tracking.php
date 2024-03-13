@@ -17,23 +17,12 @@ use Magento\Shipping\Model\Tracking\Result\Status;
 class Tracking
 {
     /**
-     * @var CarrierFactory
-     */
-    private $carrierFactory;
-
-    /**
-     * @var Escaper
-     */
-    private $escaper;
-
-    /**
      * Tracking constructor.
      * @param CarrierFactory $carrierFactory
+     * @param Escaper        $escaper
      */
-    public function __construct(CarrierFactory $carrierFactory, Escaper $escaper)
+    public function __construct(private CarrierFactory $carrierFactory, private Escaper $escaper)
     {
-        $this->carrierFactory = $carrierFactory;
-        $this->escaper = $escaper;
     }
 
     /**

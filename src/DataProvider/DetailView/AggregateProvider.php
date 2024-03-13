@@ -14,7 +14,7 @@ class AggregateProvider implements DetailViewProviderInterface
     /**
      * @var array|DetailViewProviderInterface[]
      */
-    private $providers;
+    private array $providers;
 
     /**
      * AggregateDetailViewProvider constructor.

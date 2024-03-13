@@ -25,18 +25,12 @@ class Config implements ConfigInterface
     public const XML_PATH_CUSTOM_ATTRIBUTES_ORDER_ATTRIBUTES = 'robinhq/custom_attributes/order_attributes';
 
     /**
-     * @var ScopeConfigInterface
-     */
-    private $config;
-
-    /**
      * Config constructor.
      *
      * @param ScopeConfigInterface $config
      */
-    public function __construct(ScopeConfigInterface $config)
+    public function __construct(private ScopeConfigInterface $config)
     {
-        $this->config = $config;
     }
 
     /**
