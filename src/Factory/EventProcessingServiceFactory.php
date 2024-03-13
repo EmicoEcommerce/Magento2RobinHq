@@ -12,17 +12,11 @@ use Magento\Framework\ObjectManagerInterface;
 class EventProcessingServiceFactory
 {
     /**
-     * @var ObjectManagerInterface
-     */
-    private $objectManager;
-
-    /**
      * EventProcessingServiceFactory constructor.
      * @param ObjectManagerInterface $objectManager
      */
-    public function __construct(ObjectManagerInterface $objectManager)
+    public function __construct(private ObjectManagerInterface $objectManager)
     {
-        $this->objectManager = $objectManager;
     }
 
     /**

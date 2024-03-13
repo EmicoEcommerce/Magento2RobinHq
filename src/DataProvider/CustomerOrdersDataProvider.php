@@ -23,26 +23,6 @@ use Webmozart\Assert\Assert;
 class CustomerOrdersDataProvider implements DataProviderInterface
 {
     /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var OrderFactory
-     */
-    private $orderFactory;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var SortOrderBuilder
-     */
-    private $sortOrderBuilder;
-
-    /**
      * OrderDataProvider constructor.
      * @param OrderRepositoryInterface $orderRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
@@ -50,15 +30,11 @@ class CustomerOrdersDataProvider implements DataProviderInterface
      * @param OrderFactory $orderFactory
      */
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        SortOrderBuilder $sortOrderBuilder,
-        OrderFactory $orderFactory
+        private OrderRepositoryInterface $orderRepository,
+        private SearchCriteriaBuilder $searchCriteriaBuilder,
+        private SortOrderBuilder $sortOrderBuilder,
+        private OrderFactory $orderFactory
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->orderFactory = $orderFactory;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->sortOrderBuilder = $sortOrderBuilder;
     }
 
     /**
@@ -93,6 +69,5 @@ class CustomerOrdersDataProvider implements DataProviderInterface
         }
 
         return $robinCollection;
-
     }
 }

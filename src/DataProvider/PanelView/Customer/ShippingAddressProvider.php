@@ -13,17 +13,11 @@ use Magento\Customer\Api\Data\CustomerInterface;
 class ShippingAddressProvider implements PanelViewProviderInterface
 {
     /**
-     * @var CustomerService
-     */
-    private $customerService;
-
-    /**
      * CustomerAddressProvider constructor.
      * @param CustomerService $customerService
      */
-    public function __construct(CustomerService $customerService)
+    public function __construct(private CustomerService $customerService)
     {
-        $this->customerService = $customerService;
     }
 
     /**

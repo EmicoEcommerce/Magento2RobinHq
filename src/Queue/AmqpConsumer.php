@@ -8,25 +8,13 @@ use Psr\Log\LoggerInterface;
 class AmqpConsumer
 {
     /**
-     * @var LoggerInterface
-     */
-    private $log;
-
-    /**
-     * @var EventProcessingServiceFactory
-     */
-    private $eventProcessingServiceFactory;
-
-    /**
      * UpdateConsumer constructor.
      *
      * @param EventProcessingServiceFactory $eventProcessingServiceFactory
      * @param LoggerInterface $log
      */
-    public function __construct(EventProcessingServiceFactory $eventProcessingServiceFactory, LoggerInterface $log)
+    public function __construct(private EventProcessingServiceFactory $eventProcessingServiceFactory, private LoggerInterface $log)
     {
-        $this->log = $log;
-        $this->eventProcessingServiceFactory = $eventProcessingServiceFactory;
     }
 
     /**

@@ -21,35 +21,10 @@ use Magento\Store\Model\StoreManagerInterface;
 class OrderFactory
 {
     /**
-     * @var DetailViewProviderInterface
-     */
-    private $detailViewProvider;
-
-    /**
-     * @var ListViewProviderInterface
-     */
-    private $listViewProvider;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * Keep track of first order entityID's per customer for performance
      * @var array|OrderInterface[]
      */
-    private $firstOrders = [];
-
-    /**
-     * @var BackendUrlInterface
-     */
-    private $backendUrl;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $orderCollectionFactory;
+    private array $firstOrders = [];
 
     /**
      * OrderFactory constructor.
@@ -60,17 +35,12 @@ class OrderFactory
      * @param CollectionFactory           $orderCollectionFactory
      */
     public function __construct(
-        DetailViewProviderInterface $detailViewProvider,
-        ListViewProviderInterface $listViewProvider,
-        StoreManagerInterface $storeManager,
-        BackendUrlInterface $backendUrl,
-        CollectionFactory $orderCollectionFactory
+        private DetailViewProviderInterface $detailViewProvider,
+        private ListViewProviderInterface $listViewProvider,
+        private StoreManagerInterface $storeManager,
+        private BackendUrlInterface $backendUrl,
+        private CollectionFactory $orderCollectionFactory
     ) {
-        $this->detailViewProvider = $detailViewProvider;
-        $this->listViewProvider = $listViewProvider;
-        $this->storeManager = $storeManager;
-        $this->backendUrl = $backendUrl;
-        $this->orderCollectionFactory = $orderCollectionFactory;
     }
 
     /**

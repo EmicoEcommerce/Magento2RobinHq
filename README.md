@@ -6,8 +6,8 @@ Provides API integrations with the RobinHQ platform / dashboards
 
 ## Installation
 Prerequisites
- - Magento 2.2.0 or higer
- - PHP 7.1 or higer
+ - Magento 2.4.4 or higher
+ - PHP 8.0 or higher
 
 Install package using composer
 ```sh
@@ -111,4 +111,4 @@ For this functionality to work correctly it is mandatory to have a working Rabbi
 Use the following command to process the message queue:
 `bin/magento queue:consumers:start EmicoRobinHq`
 
-You can configure this in a cronjob.
+You can configure this in a cronjob or preferably using supervisor.

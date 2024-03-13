@@ -13,7 +13,7 @@ class AggregateProvider implements ListViewProviderInterface
     /**
      * @var array|OrderListViewProviderInterface[]
      */
-    private $providers;
+    private array $providers;
 
     /**
      * AggregateDetailViewProvider constructor.

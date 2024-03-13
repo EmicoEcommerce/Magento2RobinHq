@@ -18,31 +18,13 @@ use Psr\Log\LoggerInterface;
 class CustomAttributesProvider implements PanelViewProviderInterface
 {
     /**
-     * @var ModuleConfig
-     */
-    private $moduleConfig;
-
-    /**
-     * @var EavConfig
-     */
-    private $eavConfig;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
      * CustomerAttributesProvider constructor.
      * @param ModuleConfig $moduleConfig
      * @param EavConfig $eavConfig
      * @param LoggerInterface $logger
      */
-    public function __construct(ModuleConfig $moduleConfig, EavConfig $eavConfig, LoggerInterface $logger)
+    public function __construct(private ModuleConfig $moduleConfig, private EavConfig $eavConfig, private LoggerInterface $logger)
     {
-        $this->moduleConfig = $moduleConfig;
-        $this->eavConfig = $eavConfig;
-        $this->logger = $logger;
     }
 
     /**
