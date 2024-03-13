@@ -1,7 +1,9 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Emico\RobinHq\Controller\Api;
 
-use Emico\RobinHq\DataProvider\CustomerDataProvider;
 use Emico\RobinHq\Psr7Bridge\RequestMapper;
 use Emico\RobinHq\Psr7Bridge\ResponseMapper;
 use Emico\RobinHqLib\DataProvider\DataProviderInterface;
@@ -10,34 +12,10 @@ use InvalidArgumentException;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\HTTP\PhpEnvironment\Request;
-use Psr\Http\Message\ResponseInterface;
-use Laminas\Diactoros\ServerRequestFactory;
 use Magento\Framework\App\Response\Http as ResponseHttp;
 
 abstract class AbstractApi extends Action
 {
-    /**
-     * @var RestApiServer
-     */
-    private $restApiServer;
-    /**
-     * @var ResponseHttp
-     */
-    private $response;
-    /**
-     * @var DataProviderInterface
-     */
-    private $dataProvider;
-
-    /**
-     * @var RequestMapper
-     */
-    private $requestMapper;
-    /**
-     * @var ResponseMapper
-     */
-    private $responseMapper;
-
     /**
      * Customer constructor.
      * @param Context $context
@@ -49,18 +27,13 @@ abstract class AbstractApi extends Action
      */
     public function __construct(
         Context $context,
-        RestApiServer $restApiServer,
-        DataProviderInterface $dataProvider,
-        ResponseHttp $response,
-        RequestMapper $requestMapper,
-        ResponseMapper $responseMapper
+        private RestApiServer $restApiServer,
+        private DataProviderInterface $dataProvider,
+        private ResponseHttp $response,
+        private RequestMapper $requestMapper,
+        private ResponseMapper $responseMapper
     ) {
         parent::__construct($context);
-        $this->restApiServer = $restApiServer;
-        $this->response = $response;
-        $this->dataProvider = $dataProvider;
-        $this->requestMapper = $requestMapper;
-        $this->responseMapper = $responseMapper;
     }
 
     /**

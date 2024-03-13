@@ -25,26 +25,6 @@ use Psr\Log\LoggerInterface;
 class ProductDetailViewProvider implements DetailViewProviderInterface
 {
     /**
-     * @var PriceCurrencyInterface
-     */
-    private $priceCurrency;
-
-    /**
-     * @var Config
-     */
-    private $moduleConfig;
-
-    /**
-     * @var AttributeRetriever
-     */
-    private $attributeRetriever;
-
-    /**
-     * @var ProductDataProviderInterface
-     */
-    private $productDataProvider;
-
-    /**
      * ProductDetailViewProvider constructor.
      * @param PriceCurrencyInterface $priceCurrency
      * @param Config $moduleConfig
@@ -52,15 +32,11 @@ class ProductDetailViewProvider implements DetailViewProviderInterface
      * @param ProductDataProviderInterface $productDataProvider
      */
     public function __construct(
-        PriceCurrencyInterface $priceCurrency,
-        Config $moduleConfig,
-        AttributeRetriever $attributeRetriever,
-        ProductDataProviderInterface $productDataProvider
+        private PriceCurrencyInterface $priceCurrency,
+        private Config $moduleConfig,
+        private AttributeRetriever $attributeRetriever,
+        private ProductDataProviderInterface $productDataProvider
     ) {
-        $this->priceCurrency = $priceCurrency;
-        $this->moduleConfig = $moduleConfig;
-        $this->attributeRetriever = $attributeRetriever;
-        $this->productDataProvider = $productDataProvider;
     }
 
     /**
