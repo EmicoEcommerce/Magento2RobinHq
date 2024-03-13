@@ -15,8 +15,8 @@ use Magento\Store\Model\StoreManager;
 
 class ViewedProduct implements ArgumentInterface
 {
-    public const AVAILABILITY_AVAILABLE = 'beschikbaar';
-    public const AVAILABILITY_NOT_AVAILABLE = 'niet beschikbaar';
+    public const AVAILABILITY_AVAILABLE = 'Available';
+    public const AVAILABILITY_NOT_AVAILABLE = 'Not available';
 
     public function __construct(
         private Config $config,
