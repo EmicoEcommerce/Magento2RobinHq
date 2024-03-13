@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block name="emico_robinhq_viewed_product" template="Emico_RobinHq::viewed_product.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Emico\RobinHq\ViewModel\ViewedProduct</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

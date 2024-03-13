@@ -6,6 +6,7 @@ namespace Emico\RobinHq\ViewModel;
 
 use Emico\RobinHq\Model\Config;
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Helper\Image;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
@@ -17,8 +18,12 @@ class ViewedProduct implements ArgumentInterface
     public const AVAILABILITY_AVAILABLE = 'beschikbaar';
     public const AVAILABILITY_NOT_AVAILABLE = 'niet beschikbaar';
 
-    public function __construct(private Config $config, private Registry $registry, private StoreManager $storeManager)
-    {
+    public function __construct(
+        private Config $config,
+        private Registry $registry,
+        private StoreManager $storeManager,
+        private Image $imageHelper
+    ) {
     }
 
     public function shouldRender(): bool
@@ -43,22 +48,28 @@ class ViewedProduct implements ArgumentInterface
     {
         $product = $this->getCurrentProduct();
 
-
         $store = $this->storeManager->getStore();
-//$productImageUrl = $store->getBaseUrl(UrlInterface::URL_TYPE_MEDIA) . 'catalog/product' .
-//    $product->getImage();
 
         $productData = [
             'id' => $product->getSku(),
             'name' => $product->getName(),
-            'description' => addslashes((string) preg_replace('/\s+/', ' ', trim($product->getDescription() ?? ''))),
+            'description' => addslashes(preg_replace('/\s+/', ' ', trim($product->getDescription() ?? ''))),
             'url' => $product->getProductUrl(),
-            'imageUrl' => 'todo',
+            'imageUrl' => $this->getImageUrl($product),
             'price' => $product->getFinalPrice(),
             'currency' => $store->getCurrentCurrencyCode(),
             'availability' => ($product->isSalable() ? self::AVAILABILITY_AVAILABLE : self::AVAILABILITY_NOT_AVAILABLE)
         ];
 
-        return json_encode([]);
+        return json_encode($productData);
+    }
+
+    protected function getImageUrl(Product $product): string
+    {
+        $productImage = $this->imageHelper
+            ->init($product, 'small_image')
+            ->setImageFile($product->getImage());
+
+        return $productImage->getUrl() ?? '';
     }
 }
