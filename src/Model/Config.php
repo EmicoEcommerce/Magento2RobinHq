@@ -23,6 +23,7 @@ class Config implements ConfigInterface
     public const XML_PATH_CUSTOM_ATTRIBUTES_CUSTOMER_ATTRIBUTES = 'robinhq/custom_attributes/customer_attributes';
     public const XML_PATH_CUSTOM_ATTRIBUTES_PRODUCT_ATTRIBUTES = 'robinhq/custom_attributes/product_attributes';
     public const XML_PATH_CUSTOM_ATTRIBUTES_ORDER_ATTRIBUTES = 'robinhq/custom_attributes/order_attributes';
+    public const XML_PATH_VIEW_PRODUCTS = 'robinhq/js_widgets/enable_viewed_products';
 
     /**
      * Config constructor.
@@ -109,6 +110,14 @@ class Config implements ConfigInterface
     public function isPostApiEnabled(): bool
     {
         return $this->isConfigFlagSet(self::XML_PATH_API_POST_ENABLED);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isViewedProductsEnabled(): bool
+    {
+        return $this->isConfigFlagSet(self::XML_PATH_VIEW_PRODUCTS);
     }
 
     /**

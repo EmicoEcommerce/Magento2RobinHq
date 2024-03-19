@@ -112,3 +112,15 @@ Use the following command to process the message queue:
 `bin/magento queue:consumers:start EmicoRobinHq`
 
 You can configure this in a cronjob or preferably using supervisor.
+
+## Frontend widgets
+
+This module provides a widget to display the RobinHQ tracking script on your website.
+This makes it possible to gain insight into all products viewed by the customer and the contents of the shopping cart.
+Should work out of the box with the default Luma theme.
+
+See: https://developers.cm.com/mobile-service-cloud/docs/viewed-products
+
+To enable this feature you have to enable it in the configuration.
+
+`Stores` -> `Configuration` -> `Emico` -> `RobinHQ` -> `Enable viewed products tracking`

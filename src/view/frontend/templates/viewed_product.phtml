@@ -1,0 +1,19 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $viewModel \Emico\RobinHq\ViewModel\ViewedProduct
+ */
+
+$viewModel = $block->getViewModel();
+
+if (!$viewModel->shouldRender()) {
+    return;
+}
+?>
+<script type="text/javascript">
+    if (typeof __robin !== 'undefined') {
+        setTimeout(function () {
+            __robin.addViewedProduct(<?= $viewModel->getViewedProductJson(); ?>);
+        }, 3000);
+    }
+</script>
