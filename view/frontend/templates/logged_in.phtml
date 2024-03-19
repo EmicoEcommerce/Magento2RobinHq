@@ -4,6 +4,7 @@
  * @var $viewModel \Emico\RobinHq\ViewModel\LoggedInCustomer
  */
 
+$viewModel = $block->getViewModel();
 if (!$viewModel->shouldRender()) {
     return '';
 }
