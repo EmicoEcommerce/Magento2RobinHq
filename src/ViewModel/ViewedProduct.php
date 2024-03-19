@@ -18,6 +18,12 @@ class ViewedProduct implements ArgumentInterface
     public const AVAILABILITY_AVAILABLE = 'Available';
     public const AVAILABILITY_NOT_AVAILABLE = 'Not available';
 
+    /**
+     * @param Config       $config
+     * @param Registry     $registry
+     * @param StoreManager $storeManager
+     * @param Image        $imageHelper
+     */
     public function __construct(
         private Config $config,
         private Registry $registry,
@@ -26,6 +32,9 @@ class ViewedProduct implements ArgumentInterface
     ) {
     }
 
+    /**
+     * @return bool
+     */
     public function shouldRender(): bool
     {
         if (!$this->getCurrentProduct()) {
@@ -39,11 +48,17 @@ class ViewedProduct implements ArgumentInterface
         return true;
     }
 
+    /**
+     * @return Product|null
+     */
     protected function getCurrentProduct(): ?Product
     {
         return $this->registry->registry('current_product');
     }
 
+    /**
+     * @return string
+     */
     public function getViewedProductJson(): string
     {
         $product = $this->getCurrentProduct();
@@ -64,6 +79,10 @@ class ViewedProduct implements ArgumentInterface
         return json_encode($productData);
     }
 
+    /**
+     * @param Product $product
+     * @return string
+     */
     protected function getImageUrl(Product $product): string
     {
         $productImage = $this->imageHelper

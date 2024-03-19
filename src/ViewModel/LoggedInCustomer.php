@@ -11,17 +11,27 @@ use Psr\Log\LoggerInterface;
 
 class LoggedInCustomer implements ArgumentInterface
 {
+    /**
+     * @param LoggerInterface $logger
+     * @param Session         $customerSession
+     */
     public function __construct(
         private LoggerInterface $logger,
         private Session $customerSession
     ) {
     }
 
+    /**
+     * @return bool
+     */
     public function shouldRender(): bool
     {
         return $this->customerSession->getCustomerId() !== null;
     }
 
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         try {
@@ -32,6 +42,9 @@ class LoggedInCustomer implements ArgumentInterface
         }
     }
 
+    /**
+     * @return string
+     */
     public function getEmail(): string
     {
         return $this->customerSession->getCustomer()->getEmail();

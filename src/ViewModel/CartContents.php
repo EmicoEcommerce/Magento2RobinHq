@@ -10,10 +10,17 @@ use Magento\Checkout\Model\Session;
 
 class CartContents implements ArgumentInterface
 {
+    /**
+     * @param Config  $config
+     * @param Session $checkoutSession
+     */
     public function __construct(private Config $config, private Session $checkoutSession)
     {
     }
 
+    /**
+     * @return bool
+     */
     public function shouldRender(): bool
     {
         if (!$this->config->isViewedProductsEnabled()) {
@@ -27,6 +34,9 @@ class CartContents implements ArgumentInterface
         return true;
     }
 
+    /**
+     * @return string
+     */
     public function getCartContentsJson(): string
     {
         $quote = $this->checkoutSession->getQuote();
