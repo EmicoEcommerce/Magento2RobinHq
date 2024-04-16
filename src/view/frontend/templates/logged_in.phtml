@@ -11,11 +11,12 @@ if (!$viewModel->shouldRender()) {
 ?>
 <script type="text/javascript">
     if (typeof __robin !== 'undefined') {
+        var customer = getCustomer();
         var robin_settings = {
             callback: function (event, data) {
                 if (event == 'init') {
-                    var name = '<?= $viewModel->getName(); ?>';		// determine real name
-                    var email = '<?= $viewModel->getEmail(); ?>';	// determine real email
+                    var name = customer.fullname;	// determine real name
+                    var email = customer.email;	    // determine real email
 
                     if (email != null && email != '') {
                         var ws = __robin.getWebStore();
@@ -29,4 +30,23 @@ if (!$viewModel->shouldRender()) {
         };
     }
 
+    /**
+     * Get the customer from the local storage, because the PHP customer session is depersonalized on cached pages
+     * @returns {Object}
+     */
+    function getCustomer()
+    {
+        if (localStorage.getItem('mage-cache-storage') != null) {
+            var mageCacheStorage = JSON.parse(localStorage.getItem('mage-cache-storage'));
+
+            if (typeof mageCacheStorage.customer !== 'undefined') {
+                return mageCacheStorage.customer;
+            }
+
+        }
+        return {
+            fullName: 'Unknown',
+            email: 'unknown@unknown.com'
+        };
+    }
 </script>
