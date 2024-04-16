@@ -3,11 +3,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="content">
-            <block name="emico_robinhq_logged_in" template="Emico_RobinHq::logged_in.phtml">
-                <arguments>
-                    <argument name="view_model" xsi:type="object">Emico\RobinHq\ViewModel\LoggedInCustomer</argument>
-                </arguments>
-            </block>
+            <block name="emico_robinhq_logged_in" template="Emico_RobinHq::logged_in.phtml"/>
         </referenceContainer>
     </body>
 </page>
