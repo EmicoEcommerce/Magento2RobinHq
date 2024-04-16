@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace Emico\RobinHq\Plugin\Frontend\Magento\Framework\View\Result;
 
 use Magento\Checkout\Helper\Cart;
-use Magento\Customer\Model\Session;
 
 class Layout
 {
     /**
      * Layout constructor.
-     * @param Session $customerSession
-     * @param Cart    $cartHelper
+     * @param Cart $cartHelper
      */
-    public function __construct(private Session $customerSession, private Cart $cartHelper)
+    public function __construct(private Cart $cartHelper)
     {
     }
 
@@ -31,9 +29,7 @@ class Layout
         \Magento\Framework\View\Result\Layout $subject,
         mixed $result
     ) {
-        if ($this->customerSession->getCustomerId()) {
-            $result->addHandle('robinhq_customer_logged_in');
-        }
+        $result->addHandle('robinhq_customer_logged_in');
 
         if ($this->cartHelper->getItemsCount() !== 0) {
             $result->addHandle('robinhq_cart_contents');

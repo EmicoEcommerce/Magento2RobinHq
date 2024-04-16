@@ -1,21 +1,16 @@
 <?php
 /**
  * @var $block \Magento\Framework\View\Element\Template
- * @var $viewModel \Emico\RobinHq\ViewModel\LoggedInCustomer
  */
-
-$viewModel = $block->getViewModel();
-if (!$viewModel->shouldRender()) {
-    return '';
-}
 ?>
 <script type="text/javascript">
-    if (typeof __robin !== 'undefined') {
+    if (typeof __robin !== 'undefined' && isLoggedIn()) {
+        var customer = getCustomer();
         var robin_settings = {
             callback: function (event, data) {
                 if (event == 'init') {
-                    var name = '<?= $viewModel->getName(); ?>';		// determine real name
-                    var email = '<?= $viewModel->getEmail(); ?>';	// determine real email
+                    var name = customer.fullname;	// determine real name
+                    var email = customer.email;	    // determine real email
 
                     if (email != null && email != '') {
                         var ws = __robin.getWebStore();
@@ -29,4 +24,40 @@ if (!$viewModel->shouldRender()) {
         };
     }
 
+    /**
+     * Function to check if customer is logged in
+     * @returns {boolean}
+     */
+    function isLoggedIn() {
+        var mageCacheStorage = getMageCacheStorage();
+
+        return mageCacheStorage != null && typeof mageCacheStorage.customer !== 'undefined';
+    }
+
+    /**
+     * Get the customer from the local storage, because the PHP customer session is depersonalized on cached pages
+     * @returns {Object}
+     */
+    function getCustomer() {
+        var mageCacheStorage = getMageCacheStorage();
+        if (mageCacheStorage != null && typeof mageCacheStorage.customer !== 'undefined') {
+            return mageCacheStorage.customer;
+        }
+
+        return {
+            fullname: 'Unknown',
+            email: 'unknown@unknown.com'
+        };
+    }
+
+    /**
+     * @returns {Object|null}
+     */
+    function getMageCacheStorage()
+    {
+        if (localStorage.getItem('mage-cache-storage') != null) {
+            return JSON.parse(localStorage.getItem('mage-cache-storage'));
+        }
+        return null;
+    }
 </script>
