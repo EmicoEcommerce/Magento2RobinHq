@@ -117,14 +117,30 @@ class SearchDataProvider implements DataProviderInterface
             ->setValue($searchTerm . '%')
             ->setConditionType('like');
 
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilters([$emailFilter, $idFilter])
+        $searchCriteriaEmail = $this->searchCriteriaBuilder
+            ->addFilters([$emailFilter])
             ->setPageSize(10)
             ->create();
 
-        $orders = $this->orderRepository
-            ->getList($searchCriteria)
+        $searchCriteriaIncrementId = $this->searchCriteriaBuilder
+            ->addFilters([$idFilter])
+            ->setPageSize(10)
+            ->create();
+
+        $ordersEmail = $this->orderRepository
+            ->getList($searchCriteriaEmail)
             ->getItems();
+
+        $ordersIncrementId = $this->orderRepository
+            ->getList($searchCriteriaIncrementId)
+            ->getItems();
+
+        $orders = [];
+        foreach (array_merge($ordersIncrementId, $ordersEmail) as $order) {
+            $key = $order->getEntityId();
+            $orders[$key] = $order;
+        }
+        $orders = array_values($orders);
 
         foreach ($orders as $order) {
             $customerCollection->addElement($this->orderFactory->createRobinOrder($order));
@@ -132,6 +148,7 @@ class SearchDataProvider implements DataProviderInterface
 
         return $customerCollection;
     }
+
 
     /**
      * This method creates a Filter for phone numbers
