@@ -4,12 +4,11 @@
  * @copyright (c) Emico B.V. 2017
  */
 
-namespace Emico\RobinHq\DataProvider;
+namespace Emico\RobinHqExtend\DataProvider;
 
 use Emico\RobinHq\Mapper\CustomerFactory;
 use Emico\RobinHq\Mapper\OrderFactory;
 use Emico\RobinHqLib\DataProvider\DataProviderInterface;
-use Emico\RobinHqLib\DataProvider\Exception\DataNotFoundException;
 use Emico\RobinHqLib\Model\Collection;
 use Emico\RobinHqLib\Model\SearchResult;
 use JsonSerializable;
@@ -34,13 +33,12 @@ class SearchDataProvider implements DataProviderInterface
      * @param OrderFactory $orderFactory
      */
     public function __construct(
-        private OrderRepositoryInterface $orderRepository,
+        private OrderRepositoryInterface    $orderRepository,
         private CustomerRepositoryInterface $customerRepository,
-        private SearchCriteriaBuilder $searchCriteriaBuilder,
-        private CustomerFactory $customerFactory,
-        private OrderFactory $orderFactory
-    ) {
-    }
+        private SearchCriteriaBuilder       $searchCriteriaBuilder,
+        private CustomerFactory             $customerFactory,
+        private OrderFactory                $orderFactory
+    ){}
 
     /**
      * @param ServerRequestInterface $request
@@ -117,14 +115,25 @@ class SearchDataProvider implements DataProviderInterface
             ->setValue($searchTerm . '%')
             ->setConditionType('like');
 
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilters([$emailFilter, $idFilter])
+        $searchCriteriaEmail = $this->searchCriteriaBuilder
+            ->addFilters([$emailFilter])
             ->setPageSize(10)
             ->create();
 
-        $orders = $this->orderRepository
-            ->getList($searchCriteria)
+        $searchCriteriaIncrementId = $this->searchCriteriaBuilder
+            ->addFilters([$idFilter])
+            ->setPageSize(10)
+            ->create();
+
+        $ordersEmail = $this->orderRepository
+            ->getList($searchCriteriaEmail)
             ->getItems();
+
+        $ordersIncrementId = $this->orderRepository
+            ->getList($searchCriteriaIncrementId)
+            ->getItems();
+
+        $orders = array_merge($ordersIncrementId, $ordersEmail);
 
         foreach ($orders as $order) {
             $customerCollection->addElement($this->orderFactory->createRobinOrder($order));
@@ -178,7 +187,7 @@ class SearchDataProvider implements DataProviderInterface
         // it doesn't seem to be a Dutch number, is it numeric?
         if (is_numeric($searchTerm) === true) {
             // yes, so again return the last 9 digits
-            return (int) substr($searchTerm, -9);
+            return (int)substr($searchTerm, -9);
         }
 
         // in all other cases it isn't a phone number for sure
@@ -195,15 +204,15 @@ class SearchDataProvider implements DataProviderInterface
      */
     protected function seemsDutchNumber(string $searchTerm): bool
     {
-        if ((bool) preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
+        if ((bool)preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
             return true;
         }
 
-        if ((bool) preg_match('/^0031[0-9]{9}$/', $searchTerm) !== false) {
+        if ((bool)preg_match('/^0031[0-9]{9}$/', $searchTerm) !== false) {
             return true;
         }
 
-        if ((bool) preg_match('/^0[0-9]{9}$/', $searchTerm) !== false) {
+        if ((bool)preg_match('/^0[0-9]{9}$/', $searchTerm) !== false) {
             return true;
         }
 
@@ -218,7 +227,7 @@ class SearchDataProvider implements DataProviderInterface
      */
     protected function createDutchPhoneNumbers(string $phoneNumber): array
     {
-        $phoneNumber = (int) substr($phoneNumber, -9);
+        $phoneNumber = (int)substr($phoneNumber, -9);
         return [
             '+31' . $phoneNumber,
             '0031' . $phoneNumber,
