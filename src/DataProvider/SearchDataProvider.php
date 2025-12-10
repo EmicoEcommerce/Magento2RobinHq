@@ -4,11 +4,12 @@
  * @copyright (c) Emico B.V. 2017
  */
 
-namespace Emico\RobinHqExtend\DataProvider;
+namespace Emico\RobinHq\DataProvider;
 
 use Emico\RobinHq\Mapper\CustomerFactory;
 use Emico\RobinHq\Mapper\OrderFactory;
 use Emico\RobinHqLib\DataProvider\DataProviderInterface;
+use Emico\RobinHqLib\DataProvider\Exception\DataNotFoundException;
 use Emico\RobinHqLib\Model\Collection;
 use Emico\RobinHqLib\Model\SearchResult;
 use JsonSerializable;
@@ -33,12 +34,13 @@ class SearchDataProvider implements DataProviderInterface
      * @param OrderFactory $orderFactory
      */
     public function __construct(
-        private OrderRepositoryInterface    $orderRepository,
+        private OrderRepositoryInterface $orderRepository,
         private CustomerRepositoryInterface $customerRepository,
-        private SearchCriteriaBuilder       $searchCriteriaBuilder,
-        private CustomerFactory             $customerFactory,
-        private OrderFactory                $orderFactory
-    ){}
+        private SearchCriteriaBuilder $searchCriteriaBuilder,
+        private CustomerFactory $customerFactory,
+        private OrderFactory $orderFactory
+    ) {
+    }
 
     /**
      * @param ServerRequestInterface $request
@@ -133,7 +135,12 @@ class SearchDataProvider implements DataProviderInterface
             ->getList($searchCriteriaIncrementId)
             ->getItems();
 
-        $orders = array_merge($ordersIncrementId, $ordersEmail);
+        $orders = [];
+        foreach (array_merge($ordersIncrementId, $ordersEmail) as $order) {
+            $key = $order->getEntityId();
+            $orders[$key] = $order;
+        }
+        $orders = array_values($orders);
 
         foreach ($orders as $order) {
             $customerCollection->addElement($this->orderFactory->createRobinOrder($order));
@@ -141,6 +148,7 @@ class SearchDataProvider implements DataProviderInterface
 
         return $customerCollection;
     }
+
 
     /**
      * This method creates a Filter for phone numbers
@@ -187,7 +195,7 @@ class SearchDataProvider implements DataProviderInterface
         // it doesn't seem to be a Dutch number, is it numeric?
         if (is_numeric($searchTerm) === true) {
             // yes, so again return the last 9 digits
-            return (int)substr($searchTerm, -9);
+            return (int) substr($searchTerm, -9);
         }
 
         // in all other cases it isn't a phone number for sure
@@ -204,15 +212,15 @@ class SearchDataProvider implements DataProviderInterface
      */
     protected function seemsDutchNumber(string $searchTerm): bool
     {
-        if ((bool)preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
+        if ((bool) preg_match('/^\+31[0-9]{9}$/', $searchTerm) !== false) {
             return true;
         }
 
-        if ((bool)preg_match('/^0031[0-9]{9}$/', $searchTerm) !== false) {
+        if ((bool) preg_match('/^0031[0-9]{9}$/', $searchTerm) !== false) {
             return true;
         }
 
-        if ((bool)preg_match('/^0[0-9]{9}$/', $searchTerm) !== false) {
+        if ((bool) preg_match('/^0[0-9]{9}$/', $searchTerm) !== false) {
             return true;
         }
 
@@ -227,7 +235,7 @@ class SearchDataProvider implements DataProviderInterface
      */
     protected function createDutchPhoneNumbers(string $phoneNumber): array
     {
-        $phoneNumber = (int)substr($phoneNumber, -9);
+        $phoneNumber = (int) substr($phoneNumber, -9);
         return [
             '+31' . $phoneNumber,
             '0031' . $phoneNumber,
