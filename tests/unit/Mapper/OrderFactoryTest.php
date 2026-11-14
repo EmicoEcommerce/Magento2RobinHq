@@ -17,6 +17,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -60,6 +61,11 @@ class OrderFactoryTest extends \Codeception\Test\Unit
     private $backendUrlInterfaceMock;
 
     /**
+     * @var TimezoneInterface|Mockery\LegacyMockInterface|Mockery\MockInterface
+     */
+    private $timezoneMock;
+
+    /**
      * @var UnitTester
      */
     protected $tester;
@@ -100,6 +106,9 @@ class OrderFactoryTest extends \Codeception\Test\Unit
             ->andReturnNull()
             ->byDefault();
 
+        $this->timezoneMock = Mockery::mock(TimezoneInterface::class);
+        $this->timezoneMock->shouldReceive('getConfigTimezone')->andReturn('UTC')->byDefault();
+
         $this->orderFactory = $this->objectManager->getObject(
             OrderFactory::class,
             [
@@ -107,7 +116,8 @@ class OrderFactoryTest extends \Codeception\Test\Unit
                 'listViewProvider' => $this->listViewProviderMock,
                 'detailViewProvider' => $this->detailsViewProviderMock,
                 'storeManager' => $this->storeManagerMock,
-                'backendUrl' => $this->backendUrlInterfaceMock
+                'backendUrl' => $this->backendUrlInterfaceMock,
+                'timezone' => $this->timezoneMock
             ]
         );
     }
@@ -127,6 +137,25 @@ class OrderFactoryTest extends \Codeception\Test\Unit
         $this->assertEquals(Unit::ORDER_GRAND_TOTAL, $robinOrder->getOldRevenue());
         $this->assertEquals(Unit::CUSTOMER_EMAIL, $robinOrder->getEmailAddress());
         $this->assertTrue($robinOrder->isFirstOrder());
+    }
+
+    public function testOrderDateIsSentInStoreTimezone(): void
+    {
+        $orderFixture = $this->tester->createOrderFixture();
+
+        $this->timezoneMock
+            ->shouldReceive('getConfigTimezone')
+            ->with('store', Unit::ORDER_STORE_ID)
+            ->andReturn('Asia/Tokyo');
+
+        $robinOrder = $this->orderFactory->createRobinOrder($orderFixture);
+
+        $orderDate = $robinOrder->getOrderDate();
+        $this->assertEquals('2020-01-10T23:05:27+09:00', $orderDate->format(DATE_ATOM));
+        $this->assertEquals(
+            (new \DateTimeImmutable(Unit::ORDER_CREATED_AT, new \DateTimeZone('UTC')))->getTimestamp(),
+            $orderDate->getTimestamp()
+        );
     }
 
     public function testCanAddListViewItems(): void
