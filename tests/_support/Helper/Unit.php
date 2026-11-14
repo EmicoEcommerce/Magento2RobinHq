@@ -28,6 +28,7 @@ class Unit extends Module
     public const CUSTOMER_MIDDLENAME = 'van';
     public const CUSTOMER_LASTNAME = 'Doe';
     public const CUSTOMER_FULLNAME = 'John van Doe';
+    public const CUSTOMER_STORE_ID = 2;
     public const CUSTOMER_CREATED_AT = '2020-01-10 14:05:27';
     public const CUSTOMER_ID = 1;
 
@@ -78,6 +79,7 @@ class Unit extends Module
             'getLastname' => self::CUSTOMER_LASTNAME,
             'getId' => self::CUSTOMER_ID,
             'getCreatedAt' => self::CUSTOMER_CREATED_AT,
+            'getStoreId' => self::CUSTOMER_STORE_ID,
             'getAddresses' => [$this->createAddressFixture()],
         ], $expectations));
     }

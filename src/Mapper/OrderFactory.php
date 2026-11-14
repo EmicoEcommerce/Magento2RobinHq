@@ -7,9 +7,11 @@ use Emico\RobinHq\DataProvider\ListView\Order\ListViewProviderInterface;
 use Emico\RobinHqLib\Model\Order;
 use Magento\Backend\Model\UrlInterface as BackendUrlInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 
@@ -33,13 +35,15 @@ class OrderFactory
      * @param StoreManagerInterface       $storeManager
      * @param BackendUrlInterface         $backendUrl
      * @param CollectionFactory           $orderCollectionFactory
+     * @param TimezoneInterface           $timezone
      */
     public function __construct(
         private DetailViewProviderInterface $detailViewProvider,
         private ListViewProviderInterface $listViewProvider,
         private StoreManagerInterface $storeManager,
         private BackendUrlInterface $backendUrl,
-        private CollectionFactory $orderCollectionFactory
+        private CollectionFactory $orderCollectionFactory,
+        private TimezoneInterface $timezone
     ) {
     }
 
@@ -51,7 +55,7 @@ class OrderFactory
     public function createRobinOrder(OrderInterface $order): Order
     {
         $robinOrder = new Order($order->getIncrementId());
-        $robinOrder->setOrderDate(new \DateTimeImmutable($order->getCreatedAt()));
+        $robinOrder->setOrderDate($this->toStoreTimezone($order->getCreatedAt(), $order->getStoreId()));
         $robinOrder->setRevenue($order->getGrandTotal() - $order->getTotalRefunded());
         $robinOrder->setOldRevenue($order->getGrandTotal());
         $robinOrder->setName($this->getCustomerFullName($order));
@@ -140,5 +144,17 @@ class OrderFactory
     {
         $orderUrl = $this->backendUrl->getUrl('sales/order/view', ['order_id' => $order->getEntityId()]);
         return preg_replace('/(.*\/)key\/.*/', '$1', $orderUrl);
+    }
+
+    /**
+     * @param string|null $utcDate
+     * @param int|string|null $storeId
+     * @return \DateTimeImmutable
+     */
+    private function toStoreTimezone(?string $utcDate, int|string|null $storeId): \DateTimeImmutable
+    {
+        $timezone = new \DateTimeZone($this->timezone->getConfigTimezone(ScopeInterface::SCOPE_STORE, $storeId));
+
+        return (new \DateTimeImmutable($utcDate, new \DateTimeZone('UTC')))->setTimezone($timezone);
     }
 }

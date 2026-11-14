@@ -12,6 +12,7 @@ use Emico\RobinHq\Service\CustomerService;
 use Helper\Unit;
 use Magento\Framework\Api\Search\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -43,6 +44,11 @@ class CustomerFactoryTest extends \Codeception\Test\Unit
     private $panelViewProviderMock;
 
     /**
+     * @var TimezoneInterface|Mockery\LegacyMockInterface|Mockery\MockInterface
+     */
+    private $timezoneMock;
+
+    /**
      * @var UnitTester
      */
     protected $tester;
@@ -66,6 +72,9 @@ class CustomerFactoryTest extends \Codeception\Test\Unit
             ->andReturn([])
             ->byDefault();
 
+        $this->timezoneMock = Mockery::mock(TimezoneInterface::class);
+        $this->timezoneMock->shouldReceive('getConfigTimezone')->andReturn('UTC')->byDefault();
+
         $this->objectManager = new ObjectManager($this);
 
         $this->customerMapper = $this->objectManager->getObject(
@@ -73,7 +82,8 @@ class CustomerFactoryTest extends \Codeception\Test\Unit
             [
                 'orderCollectionFactory' => $orderCollectionFactoryMock,
                 'panelViewProvider' => $this->panelViewProviderMock,
-                'customerService' => $this->objectManager->getObject(CustomerService::class)
+                'customerService' => $this->objectManager->getObject(CustomerService::class),
+                'timezone' => $this->timezoneMock
             ]
         );
     }
@@ -109,6 +119,27 @@ class CustomerFactoryTest extends \Codeception\Test\Unit
         $this->assertEquals(Unit::ORDER_GRAND_TOTAL - Unit::ORDER_TOTAL_REFUNDED, $robinCustomer->getTotalRevenue());
         $this->assertEquals(Unit::ORDER_BASE_CURRENCY, $robinCustomer->getCurrency());
         $this->assertEquals(Unit::ORDER_CREATED_AT, $robinCustomer->getLastOrderDate()->format('Y-m-d H:i:s'));
+    }
+
+    public function testCustomerDatesAreSentInStoreTimezone(): void
+    {
+        $customerFixture = $this->tester->createCustomerFixture();
+        $this->orderCollectionMock
+            ->shouldReceive('getItems')
+            ->andReturn([$this->tester->createOrderFixture()]);
+        $this->timezoneMock
+            ->shouldReceive('getConfigTimezone')
+            ->with('store', Unit::CUSTOMER_STORE_ID)
+            ->andReturn('Europe/Amsterdam');
+        $this->timezoneMock
+            ->shouldReceive('getConfigTimezone')
+            ->with('store', Unit::ORDER_STORE_ID)
+            ->andReturn('America/New_York');
+
+        $robinCustomer = $this->customerMapper->createRobinCustomer($customerFixture);
+
+        $this->assertEquals('2020-01-10T15:05:27+01:00', $robinCustomer->getCustomerSince()->format(DATE_ATOM));
+        $this->assertEquals('2020-01-10T09:05:27-05:00', $robinCustomer->getLastOrderDate()->format(DATE_ATOM));
     }
 
     public function testAddPanelViewData(): void
